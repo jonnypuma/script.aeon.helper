@@ -1,0 +1,189 @@
+# Kodi add-on strings - script.aeon.helper (de_de)
+msgid ""
+msgstr ""
+"Project-Id-Version: script.aeon.helper\n"
+"Language: de_DE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "#32000"
+msgid "Refresh information"
+msgstr "Informationen aktualisieren"
+
+msgctxt "#32001"
+msgid "Update library"
+msgstr "Bibliothek aktualisieren"
+
+msgctxt "#32002"
+msgid "Clean library"
+msgstr "Bibliothek bereinigen"
+
+msgctxt "#32003"
+msgid "Take screenshot"
+msgstr "Screenshot aufnehmen"
+
+msgctxt "#32004"
+msgid "Refreshing %s"
+msgstr "%s wird aktualisiert"
+
+msgctxt "#32005"
+msgid "Reading the information"
+msgstr "Informationen werden gelesen"
+
+msgctxt "#32006"
+msgid "Episode %d of %d"
+msgstr "Episode %d von %d"
+
+msgctxt "#32007"
+msgid "Refresh failed"
+msgstr "Aktualisierung fehlgeschlagen"
+
+msgctxt "#32008"
+msgid "Done"
+msgstr "Fertig"
+
+msgctxt "#32009"
+msgid "Information refreshed"
+msgstr "Informationen aktualisiert"
+
+msgctxt "#32010"
+msgid "Refresh the information of its episodes too?"
+msgstr "Auch die Informationen der Episoden aktualisieren?"
+
+msgctxt "#32011"
+msgid "Library"
+msgstr "Bibliothek"
+
+msgctxt "#32012"
+msgid "Video library"
+msgstr "Videobibliothek"
+
+msgctxt "#32013"
+msgid "Music library"
+msgstr "Musikbibliothek"
+
+msgctxt "#32014"
+msgid "Remove the entries of the video library whose files are gone?"
+msgstr "Einträge der Videobibliothek entfernen, deren Dateien fehlen?"
+
+msgctxt "#32015"
+msgid "Remove the entries of the music library whose files are gone?"
+msgstr "Einträge der Musikbibliothek entfernen, deren Dateien fehlen?"
+
+msgctxt "#32016"
+msgid "Updating..."
+msgstr "Wird aktualisiert..."
+
+msgctxt "#32017"
+msgid "Daily"
+msgstr "Täglich"
+
+msgctxt "#32018"
+msgid "Weekly"
+msgstr "Wöchentlich"
+
+msgctxt "#32019"
+msgid "Every 2 weeks"
+msgstr "Alle 2 Wochen"
+
+msgctxt "#32020"
+msgid "Monthly"
+msgstr "Monatlich"
+
+msgctxt "#32021"
+msgid "Home menu"
+msgstr "Hauptmenü"
+
+msgctxt "#32022"
+msgid "All %d positions are in use: empty one in Skin settings > Home menu."
+msgstr "Alle %d Plätze sind belegt: Leeren Sie einen unter Skin-Einstellungen > Hauptmenü."
+
+msgctxt "#32023"
+msgid "Menu theme"
+msgstr "Menüthema"
+
+msgctxt "#32024"
+msgid "Kodi restarts to give every menu the new look."
+msgstr "Kodi startet neu, damit jedes Menü den neuen Look bekommt."
+
+msgctxt "#32025"
+msgid "Later"
+msgstr "Später"
+
+msgctxt "#32026"
+msgid "Restart"
+msgstr "Neu starten"
+
+msgctxt "#32030"
+msgid "Planner sources"
+msgstr "Planer-Quellen"
+
+msgctxt "#32031"
+msgid "Radarr"
+msgstr "Radarr"
+
+msgctxt "#32032"
+msgid "Sonarr"
+msgstr "Sonarr"
+
+msgctxt "#32033"
+msgid "Lidarr"
+msgstr "Lidarr"
+
+msgctxt "#32034"
+msgid "Address"
+msgstr "Adresse"
+
+msgctxt "#32035"
+msgid "API key"
+msgstr "API-Schlüssel"
+
+msgctxt "#32036"
+msgid "Days ahead"
+msgstr "Tage voraus"
+
+msgctxt "#32037"
+msgid "Read now"
+msgstr "Jetzt lesen"
+
+msgctxt "#32038"
+msgid "In cinemas"
+msgstr "Im Kino"
+
+msgctxt "#32039"
+msgid "In cinemas now"
+msgstr "Jetzt im Kino"
+
+msgctxt "#32040"
+msgid "On streaming"
+msgstr "Im Streaming"
+
+msgctxt "#32041"
+msgid "On Blu-ray"
+msgstr "Auf Blu-ray"
+
+msgctxt "#32042"
+msgid "New show"
+msgstr "Neue Serie"
+
+msgctxt "#32043"
+msgid "New album"
+msgstr "Neues Album"
+
+msgctxt "#32044"
+msgid "cannot be reached"
+msgstr "nicht erreichbar"
+
+msgctxt "#32045"
+msgid "Enter an address and an API key first."
+msgstr "Zuerst Adresse und API-Schlüssel eingeben."
+
+msgctxt "#32046"
+msgid "The app's address on your network, for example http://192.168.0.5:7878"
+msgstr "Die Adresse der App in deinem Netzwerk, zum Beispiel http://192.168.0.5:7878"
+
+msgctxt "#32047"
+msgid "Settings > General > Security in the app. It is sent only to this address."
+msgstr "Einstellungen > Allgemein > Sicherheit in der App. Er wird nur an diese Adresse gesendet."

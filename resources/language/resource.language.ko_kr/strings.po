@@ -1,0 +1,189 @@
+# Kodi add-on strings - script.aeon.helper (ko_kr)
+msgid ""
+msgstr ""
+"Project-Id-Version: script.aeon.helper\n"
+"Language: ko_KR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgctxt "#32000"
+msgid "Refresh information"
+msgstr "정보 새로 고침"
+
+msgctxt "#32001"
+msgid "Update library"
+msgstr "라이브러리 업데이트"
+
+msgctxt "#32002"
+msgid "Clean library"
+msgstr "라이브러리 정리"
+
+msgctxt "#32003"
+msgid "Take screenshot"
+msgstr "스크린샷 찍기"
+
+msgctxt "#32004"
+msgid "Refreshing %s"
+msgstr "%s 새로 고치는 중"
+
+msgctxt "#32005"
+msgid "Reading the information"
+msgstr "정보를 읽는 중"
+
+msgctxt "#32006"
+msgid "Episode %d of %d"
+msgstr "에피소드 %d / %d"
+
+msgctxt "#32007"
+msgid "Refresh failed"
+msgstr "새로 고침 실패"
+
+msgctxt "#32008"
+msgid "Done"
+msgstr "완료"
+
+msgctxt "#32009"
+msgid "Information refreshed"
+msgstr "정보를 새로 고쳤습니다"
+
+msgctxt "#32010"
+msgid "Refresh the information of its episodes too?"
+msgstr "에피소드 정보도 새로 고칠까요?"
+
+msgctxt "#32011"
+msgid "Library"
+msgstr "라이브러리"
+
+msgctxt "#32012"
+msgid "Video library"
+msgstr "비디오 라이브러리"
+
+msgctxt "#32013"
+msgid "Music library"
+msgstr "음악 라이브러리"
+
+msgctxt "#32014"
+msgid "Remove the entries of the video library whose files are gone?"
+msgstr "파일이 없어진 비디오 라이브러리 항목을 제거할까요?"
+
+msgctxt "#32015"
+msgid "Remove the entries of the music library whose files are gone?"
+msgstr "파일이 없어진 음악 라이브러리 항목을 제거할까요?"
+
+msgctxt "#32016"
+msgid "Updating..."
+msgstr "업데이트 중..."
+
+msgctxt "#32017"
+msgid "Daily"
+msgstr "매일"
+
+msgctxt "#32018"
+msgid "Weekly"
+msgstr "매주"
+
+msgctxt "#32019"
+msgid "Every 2 weeks"
+msgstr "2주마다"
+
+msgctxt "#32020"
+msgid "Monthly"
+msgstr "매월"
+
+msgctxt "#32021"
+msgid "Home menu"
+msgstr "홈 메뉴"
+
+msgctxt "#32022"
+msgid "All %d positions are in use: empty one in Skin settings > Home menu."
+msgstr "%d개 위치가 모두 사용 중입니다: 스킨 설정 > 홈 메뉴에서 하나를 비우세요."
+
+msgctxt "#32023"
+msgid "Menu theme"
+msgstr "메뉴 테마"
+
+msgctxt "#32024"
+msgid "Kodi restarts to give every menu the new look."
+msgstr "모든 메뉴에 새 모양을 적용하려고 Kodi가 다시 시작됩니다."
+
+msgctxt "#32025"
+msgid "Later"
+msgstr "나중에"
+
+msgctxt "#32026"
+msgid "Restart"
+msgstr "다시 시작"
+
+msgctxt "#32030"
+msgid "Planner sources"
+msgstr "플래너 소스"
+
+msgctxt "#32031"
+msgid "Radarr"
+msgstr "Radarr"
+
+msgctxt "#32032"
+msgid "Sonarr"
+msgstr "Sonarr"
+
+msgctxt "#32033"
+msgid "Lidarr"
+msgstr "Lidarr"
+
+msgctxt "#32034"
+msgid "Address"
+msgstr "주소"
+
+msgctxt "#32035"
+msgid "API key"
+msgstr "API 키"
+
+msgctxt "#32036"
+msgid "Days ahead"
+msgstr "앞으로의 일수"
+
+msgctxt "#32037"
+msgid "Read now"
+msgstr "지금 읽기"
+
+msgctxt "#32038"
+msgid "In cinemas"
+msgstr "극장 개봉"
+
+msgctxt "#32039"
+msgid "In cinemas now"
+msgstr "현재 상영 중"
+
+msgctxt "#32040"
+msgid "On streaming"
+msgstr "스트리밍 공개"
+
+msgctxt "#32041"
+msgid "On Blu-ray"
+msgstr "Blu-ray 출시"
+
+msgctxt "#32042"
+msgid "New show"
+msgstr "새 시리즈"
+
+msgctxt "#32043"
+msgid "New album"
+msgstr "새 앨범"
+
+msgctxt "#32044"
+msgid "cannot be reached"
+msgstr "연결할 수 없음"
+
+msgctxt "#32045"
+msgid "Enter an address and an API key first."
+msgstr "먼저 주소와 API 키를 입력하세요."
+
+msgctxt "#32046"
+msgid "The app's address on your network, for example http://192.168.0.5:7878"
+msgstr "네트워크에 있는 앱의 주소, 예: http://192.168.0.5:7878"
+
+msgctxt "#32047"
+msgid "Settings > General > Security in the app. It is sent only to this address."
+msgstr "앱의 설정 > 일반 > 보안. 이 주소로만 전송됩니다."

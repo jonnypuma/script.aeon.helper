@@ -1,0 +1,189 @@
+# Kodi add-on strings - script.aeon.helper (cs_cz)
+msgid ""
+msgstr ""
+"Project-Id-Version: script.aeon.helper\n"
+"Language: cs_CZ\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+
+msgctxt "#32000"
+msgid "Refresh information"
+msgstr "Obnovit informace"
+
+msgctxt "#32001"
+msgid "Update library"
+msgstr "Aktualizovat knihovnu"
+
+msgctxt "#32002"
+msgid "Clean library"
+msgstr "Vyčistit knihovnu"
+
+msgctxt "#32003"
+msgid "Take screenshot"
+msgstr "Pořídit snímek obrazovky"
+
+msgctxt "#32004"
+msgid "Refreshing %s"
+msgstr "Obnovuje se %s"
+
+msgctxt "#32005"
+msgid "Reading the information"
+msgstr "Načítání informací"
+
+msgctxt "#32006"
+msgid "Episode %d of %d"
+msgstr "Epizoda %d z %d"
+
+msgctxt "#32007"
+msgid "Refresh failed"
+msgstr "Obnovení selhalo"
+
+msgctxt "#32008"
+msgid "Done"
+msgstr "Hotovo"
+
+msgctxt "#32009"
+msgid "Information refreshed"
+msgstr "Informace obnoveny"
+
+msgctxt "#32010"
+msgid "Refresh the information of its episodes too?"
+msgstr "Obnovit také informace o jeho epizodách?"
+
+msgctxt "#32011"
+msgid "Library"
+msgstr "Knihovna"
+
+msgctxt "#32012"
+msgid "Video library"
+msgstr "Knihovna videí"
+
+msgctxt "#32013"
+msgid "Music library"
+msgstr "Knihovna hudby"
+
+msgctxt "#32014"
+msgid "Remove the entries of the video library whose files are gone?"
+msgstr "Odstranit z knihovny videí položky, jejichž soubory zmizely?"
+
+msgctxt "#32015"
+msgid "Remove the entries of the music library whose files are gone?"
+msgstr "Odstranit z knihovny hudby položky, jejichž soubory zmizely?"
+
+msgctxt "#32016"
+msgid "Updating..."
+msgstr "Aktualizace..."
+
+msgctxt "#32017"
+msgid "Daily"
+msgstr "Denně"
+
+msgctxt "#32018"
+msgid "Weekly"
+msgstr "Týdně"
+
+msgctxt "#32019"
+msgid "Every 2 weeks"
+msgstr "Každé 2 týdny"
+
+msgctxt "#32020"
+msgid "Monthly"
+msgstr "Měsíčně"
+
+msgctxt "#32021"
+msgid "Home menu"
+msgstr "Hlavní nabídka"
+
+msgctxt "#32022"
+msgid "All %d positions are in use: empty one in Skin settings > Home menu."
+msgstr "Všechna místa (%d) jsou obsazena: uvolněte jedno v Nastavení vzhledu > Hlavní nabídka."
+
+msgctxt "#32023"
+msgid "Menu theme"
+msgstr "Téma nabídek"
+
+msgctxt "#32024"
+msgid "Kodi restarts to give every menu the new look."
+msgstr "Kodi se restartuje, aby každá nabídka dostala nový vzhled."
+
+msgctxt "#32025"
+msgid "Later"
+msgstr "Později"
+
+msgctxt "#32026"
+msgid "Restart"
+msgstr "Restartovat"
+
+msgctxt "#32030"
+msgid "Planner sources"
+msgstr "Zdroje plánovače"
+
+msgctxt "#32031"
+msgid "Radarr"
+msgstr "Radarr"
+
+msgctxt "#32032"
+msgid "Sonarr"
+msgstr "Sonarr"
+
+msgctxt "#32033"
+msgid "Lidarr"
+msgstr "Lidarr"
+
+msgctxt "#32034"
+msgid "Address"
+msgstr "Adresa"
+
+msgctxt "#32035"
+msgid "API key"
+msgstr "Klíč API"
+
+msgctxt "#32036"
+msgid "Days ahead"
+msgstr "Dní dopředu"
+
+msgctxt "#32037"
+msgid "Read now"
+msgstr "Načíst nyní"
+
+msgctxt "#32038"
+msgid "In cinemas"
+msgstr "V kinech"
+
+msgctxt "#32039"
+msgid "In cinemas now"
+msgstr "Nyní v kinech"
+
+msgctxt "#32040"
+msgid "On streaming"
+msgstr "Na streamování"
+
+msgctxt "#32041"
+msgid "On Blu-ray"
+msgstr "Na Blu-ray"
+
+msgctxt "#32042"
+msgid "New show"
+msgstr "Nový seriál"
+
+msgctxt "#32043"
+msgid "New album"
+msgstr "Nové album"
+
+msgctxt "#32044"
+msgid "cannot be reached"
+msgstr "nedostupný"
+
+msgctxt "#32045"
+msgid "Enter an address and an API key first."
+msgstr "Nejprve zadejte adresu a klíč API."
+
+msgctxt "#32046"
+msgid "The app's address on your network, for example http://192.168.0.5:7878"
+msgstr "Adresa aplikace ve vaší síti, například http://192.168.0.5:7878"
+
+msgctxt "#32047"
+msgid "Settings > General > Security in the app. It is sent only to this address."
+msgstr "Nastavení > Obecné > Zabezpečení v aplikaci. Posílá se jen na tuto adresu."

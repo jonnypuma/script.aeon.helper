@@ -1,0 +1,189 @@
+# Kodi add-on strings - script.aeon.helper (ja_jp)
+msgid ""
+msgstr ""
+"Project-Id-Version: script.aeon.helper\n"
+"Language: ja_JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgctxt "#32000"
+msgid "Refresh information"
+msgstr "情報を更新"
+
+msgctxt "#32001"
+msgid "Update library"
+msgstr "ライブラリーを更新"
+
+msgctxt "#32002"
+msgid "Clean library"
+msgstr "ライブラリーを整理"
+
+msgctxt "#32003"
+msgid "Take screenshot"
+msgstr "スクリーンショットを撮る"
+
+msgctxt "#32004"
+msgid "Refreshing %s"
+msgstr "%s を更新中"
+
+msgctxt "#32005"
+msgid "Reading the information"
+msgstr "情報を読み込み中"
+
+msgctxt "#32006"
+msgid "Episode %d of %d"
+msgstr "エピソード %d / %d"
+
+msgctxt "#32007"
+msgid "Refresh failed"
+msgstr "更新に失敗しました"
+
+msgctxt "#32008"
+msgid "Done"
+msgstr "完了"
+
+msgctxt "#32009"
+msgid "Information refreshed"
+msgstr "情報を更新しました"
+
+msgctxt "#32010"
+msgid "Refresh the information of its episodes too?"
+msgstr "エピソードの情報も更新しますか?"
+
+msgctxt "#32011"
+msgid "Library"
+msgstr "ライブラリー"
+
+msgctxt "#32012"
+msgid "Video library"
+msgstr "ビデオライブラリー"
+
+msgctxt "#32013"
+msgid "Music library"
+msgstr "ミュージックライブラリー"
+
+msgctxt "#32014"
+msgid "Remove the entries of the video library whose files are gone?"
+msgstr "ファイルがなくなったビデオライブラリーの項目を削除しますか?"
+
+msgctxt "#32015"
+msgid "Remove the entries of the music library whose files are gone?"
+msgstr "ファイルがなくなったミュージックライブラリーの項目を削除しますか?"
+
+msgctxt "#32016"
+msgid "Updating..."
+msgstr "更新中..."
+
+msgctxt "#32017"
+msgid "Daily"
+msgstr "毎日"
+
+msgctxt "#32018"
+msgid "Weekly"
+msgstr "毎週"
+
+msgctxt "#32019"
+msgid "Every 2 weeks"
+msgstr "2週間ごと"
+
+msgctxt "#32020"
+msgid "Monthly"
+msgstr "毎月"
+
+msgctxt "#32021"
+msgid "Home menu"
+msgstr "ホームメニュー"
+
+msgctxt "#32022"
+msgid "All %d positions are in use: empty one in Skin settings > Home menu."
+msgstr "%d 個の位置はすべて使用中です: スキン設定 > ホームメニューで1つ空けてください。"
+
+msgctxt "#32023"
+msgid "Menu theme"
+msgstr "メニューのテーマ"
+
+msgctxt "#32024"
+msgid "Kodi restarts to give every menu the new look."
+msgstr "すべてのメニューに新しい外観を適用するため Kodi を再起動します。"
+
+msgctxt "#32025"
+msgid "Later"
+msgstr "後で"
+
+msgctxt "#32026"
+msgid "Restart"
+msgstr "再起動"
+
+msgctxt "#32030"
+msgid "Planner sources"
+msgstr "プランナーのソース"
+
+msgctxt "#32031"
+msgid "Radarr"
+msgstr "Radarr"
+
+msgctxt "#32032"
+msgid "Sonarr"
+msgstr "Sonarr"
+
+msgctxt "#32033"
+msgid "Lidarr"
+msgstr "Lidarr"
+
+msgctxt "#32034"
+msgid "Address"
+msgstr "アドレス"
+
+msgctxt "#32035"
+msgid "API key"
+msgstr "API キー"
+
+msgctxt "#32036"
+msgid "Days ahead"
+msgstr "先の日数"
+
+msgctxt "#32037"
+msgid "Read now"
+msgstr "今すぐ読み込む"
+
+msgctxt "#32038"
+msgid "In cinemas"
+msgstr "劇場公開"
+
+msgctxt "#32039"
+msgid "In cinemas now"
+msgstr "劇場公開中"
+
+msgctxt "#32040"
+msgid "On streaming"
+msgstr "配信開始"
+
+msgctxt "#32041"
+msgid "On Blu-ray"
+msgstr "Blu-ray 発売"
+
+msgctxt "#32042"
+msgid "New show"
+msgstr "新しい番組"
+
+msgctxt "#32043"
+msgid "New album"
+msgstr "新しいアルバム"
+
+msgctxt "#32044"
+msgid "cannot be reached"
+msgstr "接続できません"
+
+msgctxt "#32045"
+msgid "Enter an address and an API key first."
+msgstr "先にアドレスと API キーを入力してください。"
+
+msgctxt "#32046"
+msgid "The app's address on your network, for example http://192.168.0.5:7878"
+msgstr "ネットワーク上のアプリのアドレス（例 http://192.168.0.5:7878）"
+
+msgctxt "#32047"
+msgid "Settings > General > Security in the app. It is sent only to this address."
+msgstr "アプリの 設定 > 一般 > セキュリティ。このアドレスにだけ送られます。"

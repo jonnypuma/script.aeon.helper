@@ -1,0 +1,189 @@
+# Kodi add-on strings - script.aeon.helper (nb_no)
+msgid ""
+msgstr ""
+"Project-Id-Version: script.aeon.helper\n"
+"Language: nb_NO\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "#32000"
+msgid "Refresh information"
+msgstr "Oppdater informasjon"
+
+msgctxt "#32001"
+msgid "Update library"
+msgstr "Oppdater bibliotek"
+
+msgctxt "#32002"
+msgid "Clean library"
+msgstr "Rydd bibliotek"
+
+msgctxt "#32003"
+msgid "Take screenshot"
+msgstr "Ta skjermbilde"
+
+msgctxt "#32004"
+msgid "Refreshing %s"
+msgstr "Oppdaterer %s"
+
+msgctxt "#32005"
+msgid "Reading the information"
+msgstr "Leser informasjonen"
+
+msgctxt "#32006"
+msgid "Episode %d of %d"
+msgstr "Episode %d av %d"
+
+msgctxt "#32007"
+msgid "Refresh failed"
+msgstr "Oppdateringen mislyktes"
+
+msgctxt "#32008"
+msgid "Done"
+msgstr "Ferdig"
+
+msgctxt "#32009"
+msgid "Information refreshed"
+msgstr "Informasjonen er oppdatert"
+
+msgctxt "#32010"
+msgid "Refresh the information of its episodes too?"
+msgstr "Oppdatere informasjonen for episodene også?"
+
+msgctxt "#32011"
+msgid "Library"
+msgstr "Bibliotek"
+
+msgctxt "#32012"
+msgid "Video library"
+msgstr "Videobibliotek"
+
+msgctxt "#32013"
+msgid "Music library"
+msgstr "Musikkbibliotek"
+
+msgctxt "#32014"
+msgid "Remove the entries of the video library whose files are gone?"
+msgstr "Fjerne oppføringene i videobiblioteket der filene er borte?"
+
+msgctxt "#32015"
+msgid "Remove the entries of the music library whose files are gone?"
+msgstr "Fjerne oppføringene i musikkbiblioteket der filene er borte?"
+
+msgctxt "#32016"
+msgid "Updating..."
+msgstr "Oppdaterer..."
+
+msgctxt "#32017"
+msgid "Daily"
+msgstr "Daglig"
+
+msgctxt "#32018"
+msgid "Weekly"
+msgstr "Ukentlig"
+
+msgctxt "#32019"
+msgid "Every 2 weeks"
+msgstr "Annenhver uke"
+
+msgctxt "#32020"
+msgid "Monthly"
+msgstr "Månedlig"
+
+msgctxt "#32021"
+msgid "Home menu"
+msgstr "Hovedmeny"
+
+msgctxt "#32022"
+msgid "All %d positions are in use: empty one in Skin settings > Home menu."
+msgstr "Alle %d plassene er i bruk: tøm én i Draktinnstillinger > Hovedmeny."
+
+msgctxt "#32023"
+msgid "Menu theme"
+msgstr "Menytema"
+
+msgctxt "#32024"
+msgid "Kodi restarts to give every menu the new look."
+msgstr "Kodi starter på nytt for å gi alle menyer det nye utseendet."
+
+msgctxt "#32025"
+msgid "Later"
+msgstr "Senere"
+
+msgctxt "#32026"
+msgid "Restart"
+msgstr "Start på nytt"
+
+msgctxt "#32030"
+msgid "Planner sources"
+msgstr "Planleggerkilder"
+
+msgctxt "#32031"
+msgid "Radarr"
+msgstr "Radarr"
+
+msgctxt "#32032"
+msgid "Sonarr"
+msgstr "Sonarr"
+
+msgctxt "#32033"
+msgid "Lidarr"
+msgstr "Lidarr"
+
+msgctxt "#32034"
+msgid "Address"
+msgstr "Adresse"
+
+msgctxt "#32035"
+msgid "API key"
+msgstr "API-nøkkel"
+
+msgctxt "#32036"
+msgid "Days ahead"
+msgstr "Dager fremover"
+
+msgctxt "#32037"
+msgid "Read now"
+msgstr "Les nå"
+
+msgctxt "#32038"
+msgid "In cinemas"
+msgstr "På kino"
+
+msgctxt "#32039"
+msgid "In cinemas now"
+msgstr "På kino nå"
+
+msgctxt "#32040"
+msgid "On streaming"
+msgstr "På strømming"
+
+msgctxt "#32041"
+msgid "On Blu-ray"
+msgstr "På Blu-ray"
+
+msgctxt "#32042"
+msgid "New show"
+msgstr "Ny serie"
+
+msgctxt "#32043"
+msgid "New album"
+msgstr "Nytt album"
+
+msgctxt "#32044"
+msgid "cannot be reached"
+msgstr "kan ikke nås"
+
+msgctxt "#32045"
+msgid "Enter an address and an API key first."
+msgstr "Skriv inn en adresse og en API-nøkkel først."
+
+msgctxt "#32046"
+msgid "The app's address on your network, for example http://192.168.0.5:7878"
+msgstr "Appens adresse på nettverket ditt, for eksempel http://192.168.0.5:7878"
+
+msgctxt "#32047"
+msgid "Settings > General > Security in the app. It is sent only to this address."
+msgstr "Innstillinger > Generelt > Sikkerhet i appen. Den sendes bare til denne adressen."

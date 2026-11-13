@@ -1,0 +1,189 @@
+# Kodi add-on strings - script.aeon.helper (fr_fr)
+msgid ""
+msgstr ""
+"Project-Id-Version: script.aeon.helper\n"
+"Language: fr_FR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgctxt "#32000"
+msgid "Refresh information"
+msgstr "Actualiser les informations"
+
+msgctxt "#32001"
+msgid "Update library"
+msgstr "Mettre à jour la médiathèque"
+
+msgctxt "#32002"
+msgid "Clean library"
+msgstr "Nettoyer la médiathèque"
+
+msgctxt "#32003"
+msgid "Take screenshot"
+msgstr "Faire une capture d'écran"
+
+msgctxt "#32004"
+msgid "Refreshing %s"
+msgstr "Actualisation de %s"
+
+msgctxt "#32005"
+msgid "Reading the information"
+msgstr "Lecture des informations"
+
+msgctxt "#32006"
+msgid "Episode %d of %d"
+msgstr "Épisode %d sur %d"
+
+msgctxt "#32007"
+msgid "Refresh failed"
+msgstr "Échec de l'actualisation"
+
+msgctxt "#32008"
+msgid "Done"
+msgstr "Terminé"
+
+msgctxt "#32009"
+msgid "Information refreshed"
+msgstr "Informations actualisées"
+
+msgctxt "#32010"
+msgid "Refresh the information of its episodes too?"
+msgstr "Actualiser aussi les informations de ses épisodes ?"
+
+msgctxt "#32011"
+msgid "Library"
+msgstr "Médiathèque"
+
+msgctxt "#32012"
+msgid "Video library"
+msgstr "Médiathèque vidéo"
+
+msgctxt "#32013"
+msgid "Music library"
+msgstr "Médiathèque musicale"
+
+msgctxt "#32014"
+msgid "Remove the entries of the video library whose files are gone?"
+msgstr "Supprimer les entrées de la médiathèque vidéo dont les fichiers ont disparu ?"
+
+msgctxt "#32015"
+msgid "Remove the entries of the music library whose files are gone?"
+msgstr "Supprimer les entrées de la médiathèque musicale dont les fichiers ont disparu ?"
+
+msgctxt "#32016"
+msgid "Updating..."
+msgstr "Mise à jour..."
+
+msgctxt "#32017"
+msgid "Daily"
+msgstr "Chaque jour"
+
+msgctxt "#32018"
+msgid "Weekly"
+msgstr "Chaque semaine"
+
+msgctxt "#32019"
+msgid "Every 2 weeks"
+msgstr "Toutes les 2 semaines"
+
+msgctxt "#32020"
+msgid "Monthly"
+msgstr "Chaque mois"
+
+msgctxt "#32021"
+msgid "Home menu"
+msgstr "Menu d'accueil"
+
+msgctxt "#32022"
+msgid "All %d positions are in use: empty one in Skin settings > Home menu."
+msgstr "Les %d positions sont toutes prises : videz-en une dans Paramètres du skin > Menu d'accueil."
+
+msgctxt "#32023"
+msgid "Menu theme"
+msgstr "Thème des menus"
+
+msgctxt "#32024"
+msgid "Kodi restarts to give every menu the new look."
+msgstr "Kodi redémarre pour donner le nouveau look à tous les menus."
+
+msgctxt "#32025"
+msgid "Later"
+msgstr "Plus tard"
+
+msgctxt "#32026"
+msgid "Restart"
+msgstr "Redémarrer"
+
+msgctxt "#32030"
+msgid "Planner sources"
+msgstr "Sources du planificateur"
+
+msgctxt "#32031"
+msgid "Radarr"
+msgstr "Radarr"
+
+msgctxt "#32032"
+msgid "Sonarr"
+msgstr "Sonarr"
+
+msgctxt "#32033"
+msgid "Lidarr"
+msgstr "Lidarr"
+
+msgctxt "#32034"
+msgid "Address"
+msgstr "Adresse"
+
+msgctxt "#32035"
+msgid "API key"
+msgstr "Clé API"
+
+msgctxt "#32036"
+msgid "Days ahead"
+msgstr "Jours à venir"
+
+msgctxt "#32037"
+msgid "Read now"
+msgstr "Lire maintenant"
+
+msgctxt "#32038"
+msgid "In cinemas"
+msgstr "Au cinéma"
+
+msgctxt "#32039"
+msgid "In cinemas now"
+msgstr "Au cinéma maintenant"
+
+msgctxt "#32040"
+msgid "On streaming"
+msgstr "En streaming"
+
+msgctxt "#32041"
+msgid "On Blu-ray"
+msgstr "En Blu-ray"
+
+msgctxt "#32042"
+msgid "New show"
+msgstr "Nouvelle série"
+
+msgctxt "#32043"
+msgid "New album"
+msgstr "Nouvel album"
+
+msgctxt "#32044"
+msgid "cannot be reached"
+msgstr "injoignable"
+
+msgctxt "#32045"
+msgid "Enter an address and an API key first."
+msgstr "Saisissez d'abord une adresse et une clé API."
+
+msgctxt "#32046"
+msgid "The app's address on your network, for example http://192.168.0.5:7878"
+msgstr "L'adresse de l'application sur votre réseau, par exemple http://192.168.0.5:7878"
+
+msgctxt "#32047"
+msgid "Settings > General > Security in the app. It is sent only to this address."
+msgstr "Paramètres > Général > Sécurité dans l'application. Elle n'est envoyée qu'à cette adresse."

@@ -1,0 +1,189 @@
+# Kodi add-on strings - script.aeon.helper (hu_hu)
+msgid ""
+msgstr ""
+"Project-Id-Version: script.aeon.helper\n"
+"Language: hu_HU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "#32000"
+msgid "Refresh information"
+msgstr "Információk frissítése"
+
+msgctxt "#32001"
+msgid "Update library"
+msgstr "Könyvtár frissítése"
+
+msgctxt "#32002"
+msgid "Clean library"
+msgstr "Könyvtár tisztítása"
+
+msgctxt "#32003"
+msgid "Take screenshot"
+msgstr "Képernyőkép készítése"
+
+msgctxt "#32004"
+msgid "Refreshing %s"
+msgstr "Frissítés: %s"
+
+msgctxt "#32005"
+msgid "Reading the information"
+msgstr "Információk olvasása"
+
+msgctxt "#32006"
+msgid "Episode %d of %d"
+msgstr "%d. epizód / %d"
+
+msgctxt "#32007"
+msgid "Refresh failed"
+msgstr "A frissítés nem sikerült"
+
+msgctxt "#32008"
+msgid "Done"
+msgstr "Kész"
+
+msgctxt "#32009"
+msgid "Information refreshed"
+msgstr "Információk frissítve"
+
+msgctxt "#32010"
+msgid "Refresh the information of its episodes too?"
+msgstr "Az epizódjai információit is frissíted?"
+
+msgctxt "#32011"
+msgid "Library"
+msgstr "Könyvtár"
+
+msgctxt "#32012"
+msgid "Video library"
+msgstr "Videókönyvtár"
+
+msgctxt "#32013"
+msgid "Music library"
+msgstr "Zenekönyvtár"
+
+msgctxt "#32014"
+msgid "Remove the entries of the video library whose files are gone?"
+msgstr "Eltávolítod a videókönyvtár azon bejegyzéseit, amelyek fájljai eltűntek?"
+
+msgctxt "#32015"
+msgid "Remove the entries of the music library whose files are gone?"
+msgstr "Eltávolítod a zenekönyvtár azon bejegyzéseit, amelyek fájljai eltűntek?"
+
+msgctxt "#32016"
+msgid "Updating..."
+msgstr "Frissítés..."
+
+msgctxt "#32017"
+msgid "Daily"
+msgstr "Naponta"
+
+msgctxt "#32018"
+msgid "Weekly"
+msgstr "Hetente"
+
+msgctxt "#32019"
+msgid "Every 2 weeks"
+msgstr "Kéthetente"
+
+msgctxt "#32020"
+msgid "Monthly"
+msgstr "Havonta"
+
+msgctxt "#32021"
+msgid "Home menu"
+msgstr "Főmenü"
+
+msgctxt "#32022"
+msgid "All %d positions are in use: empty one in Skin settings > Home menu."
+msgstr "Mind a(z) %d hely foglalt: üríts ki egyet a Felület beállításai > Főmenü alatt."
+
+msgctxt "#32023"
+msgid "Menu theme"
+msgstr "Menütéma"
+
+msgctxt "#32024"
+msgid "Kodi restarts to give every menu the new look."
+msgstr "A Kodi újraindul, hogy minden menü megkapja az új megjelenést."
+
+msgctxt "#32025"
+msgid "Later"
+msgstr "Később"
+
+msgctxt "#32026"
+msgid "Restart"
+msgstr "Újraindítás"
+
+msgctxt "#32030"
+msgid "Planner sources"
+msgstr "Tervező forrásai"
+
+msgctxt "#32031"
+msgid "Radarr"
+msgstr "Radarr"
+
+msgctxt "#32032"
+msgid "Sonarr"
+msgstr "Sonarr"
+
+msgctxt "#32033"
+msgid "Lidarr"
+msgstr "Lidarr"
+
+msgctxt "#32034"
+msgid "Address"
+msgstr "Cím"
+
+msgctxt "#32035"
+msgid "API key"
+msgstr "API-kulcs"
+
+msgctxt "#32036"
+msgid "Days ahead"
+msgstr "Napok előre"
+
+msgctxt "#32037"
+msgid "Read now"
+msgstr "Olvasás most"
+
+msgctxt "#32038"
+msgid "In cinemas"
+msgstr "Moziban"
+
+msgctxt "#32039"
+msgid "In cinemas now"
+msgstr "Most a mozikban"
+
+msgctxt "#32040"
+msgid "On streaming"
+msgstr "Streamingen"
+
+msgctxt "#32041"
+msgid "On Blu-ray"
+msgstr "Blu-rayen"
+
+msgctxt "#32042"
+msgid "New show"
+msgstr "Új sorozat"
+
+msgctxt "#32043"
+msgid "New album"
+msgstr "Új album"
+
+msgctxt "#32044"
+msgid "cannot be reached"
+msgstr "nem érhető el"
+
+msgctxt "#32045"
+msgid "Enter an address and an API key first."
+msgstr "Előbb adjon meg címet és API-kulcsot."
+
+msgctxt "#32046"
+msgid "The app's address on your network, for example http://192.168.0.5:7878"
+msgstr "Az alkalmazás címe a hálózaton, például http://192.168.0.5:7878"
+
+msgctxt "#32047"
+msgid "Settings > General > Security in the app. It is sent only to this address."
+msgstr "Beállítások > Általános > Biztonság az alkalmazásban. Csak erre a címre kerül elküldésre."

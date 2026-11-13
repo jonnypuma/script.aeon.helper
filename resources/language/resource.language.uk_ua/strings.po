@@ -1,0 +1,189 @@
+# Kodi add-on strings - script.aeon.helper (uk_ua)
+msgid ""
+msgstr ""
+"Project-Id-Version: script.aeon.helper\n"
+"Language: uk_UA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+msgctxt "#32000"
+msgid "Refresh information"
+msgstr "Оновити інформацію"
+
+msgctxt "#32001"
+msgid "Update library"
+msgstr "Оновити медіатеку"
+
+msgctxt "#32002"
+msgid "Clean library"
+msgstr "Очистити медіатеку"
+
+msgctxt "#32003"
+msgid "Take screenshot"
+msgstr "Зробити знімок екрана"
+
+msgctxt "#32004"
+msgid "Refreshing %s"
+msgstr "Оновлення: %s"
+
+msgctxt "#32005"
+msgid "Reading the information"
+msgstr "Читання інформації"
+
+msgctxt "#32006"
+msgid "Episode %d of %d"
+msgstr "Епізод %d з %d"
+
+msgctxt "#32007"
+msgid "Refresh failed"
+msgstr "Не вдалося оновити"
+
+msgctxt "#32008"
+msgid "Done"
+msgstr "Готово"
+
+msgctxt "#32009"
+msgid "Information refreshed"
+msgstr "Інформацію оновлено"
+
+msgctxt "#32010"
+msgid "Refresh the information of its episodes too?"
+msgstr "Оновити також інформацію його епізодів?"
+
+msgctxt "#32011"
+msgid "Library"
+msgstr "Медіатека"
+
+msgctxt "#32012"
+msgid "Video library"
+msgstr "Відеотека"
+
+msgctxt "#32013"
+msgid "Music library"
+msgstr "Фонотека"
+
+msgctxt "#32014"
+msgid "Remove the entries of the video library whose files are gone?"
+msgstr "Видалити з відеотеки записи, файли яких зникли?"
+
+msgctxt "#32015"
+msgid "Remove the entries of the music library whose files are gone?"
+msgstr "Видалити з фонотеки записи, файли яких зникли?"
+
+msgctxt "#32016"
+msgid "Updating..."
+msgstr "Оновлення..."
+
+msgctxt "#32017"
+msgid "Daily"
+msgstr "Щодня"
+
+msgctxt "#32018"
+msgid "Weekly"
+msgstr "Щотижня"
+
+msgctxt "#32019"
+msgid "Every 2 weeks"
+msgstr "Раз на 2 тижні"
+
+msgctxt "#32020"
+msgid "Monthly"
+msgstr "Щомісяця"
+
+msgctxt "#32021"
+msgid "Home menu"
+msgstr "Головне меню"
+
+msgctxt "#32022"
+msgid "All %d positions are in use: empty one in Skin settings > Home menu."
+msgstr "Усі позиції (%d) зайняті: звільніть одну в Налаштування оболонки > Головне меню."
+
+msgctxt "#32023"
+msgid "Menu theme"
+msgstr "Тема меню"
+
+msgctxt "#32024"
+msgid "Kodi restarts to give every menu the new look."
+msgstr "Kodi перезапуститься, щоб усі меню отримали новий вигляд."
+
+msgctxt "#32025"
+msgid "Later"
+msgstr "Пізніше"
+
+msgctxt "#32026"
+msgid "Restart"
+msgstr "Перезапустити"
+
+msgctxt "#32030"
+msgid "Planner sources"
+msgstr "Джерела планувальника"
+
+msgctxt "#32031"
+msgid "Radarr"
+msgstr "Radarr"
+
+msgctxt "#32032"
+msgid "Sonarr"
+msgstr "Sonarr"
+
+msgctxt "#32033"
+msgid "Lidarr"
+msgstr "Lidarr"
+
+msgctxt "#32034"
+msgid "Address"
+msgstr "Адреса"
+
+msgctxt "#32035"
+msgid "API key"
+msgstr "Ключ API"
+
+msgctxt "#32036"
+msgid "Days ahead"
+msgstr "Днів наперед"
+
+msgctxt "#32037"
+msgid "Read now"
+msgstr "Прочитати зараз"
+
+msgctxt "#32038"
+msgid "In cinemas"
+msgstr "У кіно"
+
+msgctxt "#32039"
+msgid "In cinemas now"
+msgstr "Зараз у кіно"
+
+msgctxt "#32040"
+msgid "On streaming"
+msgstr "У стримінгу"
+
+msgctxt "#32041"
+msgid "On Blu-ray"
+msgstr "На Blu-ray"
+
+msgctxt "#32042"
+msgid "New show"
+msgstr "Новий серіал"
+
+msgctxt "#32043"
+msgid "New album"
+msgstr "Новий альбом"
+
+msgctxt "#32044"
+msgid "cannot be reached"
+msgstr "недоступне"
+
+msgctxt "#32045"
+msgid "Enter an address and an API key first."
+msgstr "Спочатку введіть адресу та ключ API."
+
+msgctxt "#32046"
+msgid "The app's address on your network, for example http://192.168.0.5:7878"
+msgstr "Адреса застосунку у вашій мережі, наприклад http://192.168.0.5:7878"
+
+msgctxt "#32047"
+msgid "Settings > General > Security in the app. It is sent only to this address."
+msgstr "Налаштування > Загальні > Безпека в застосунку. Надсилається лише на цю адресу."

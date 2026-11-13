@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<!-- Aeon Fuse Helper settings (0.3.53): the Planner sources. Radarr, Sonarr and Lidarr on your own network: address and
+     API key (Settings > General > Security in each app). The key goes only to that address, in the X-Api-Key header. -->
+<settings version="1">
+	<section id="script.aeon.helper">
+		<category id="plannersources" label="32030">
+			<group id="radarr" label="32031">
+				<setting id="radarr_url" type="string" label="32034" help="32046">
+					<level>0</level>
+					<default></default>
+					<constraints><allowempty>true</allowempty></constraints>
+					<control type="edit" format="string"><heading>32034</heading></control>
+				</setting>
+				<setting id="radarr_key" type="string" label="32035" help="32047">
+					<level>0</level>
+					<default></default>
+					<constraints><allowempty>true</allowempty></constraints>
+					<control type="edit" format="string"><heading>32035</heading><hidden>true</hidden></control>
+				</setting>
+			</group>
+			<group id="sonarr" label="32032">
+				<setting id="sonarr_url" type="string" label="32034" help="32046">
+					<level>0</level>
+					<default></default>
+					<constraints><allowempty>true</allowempty></constraints>
+					<control type="edit" format="string"><heading>32034</heading></control>
+				</setting>
+				<setting id="sonarr_key" type="string" label="32035" help="32047">
+					<level>0</level>
+					<default></default>
+					<constraints><allowempty>true</allowempty></constraints>
+					<control type="edit" format="string"><heading>32035</heading><hidden>true</hidden></control>
+				</setting>
+			</group>
+			<group id="lidarr" label="32033">
+				<setting id="lidarr_url" type="string" label="32034" help="32046">
+					<level>0</level>
+					<default></default>
+					<constraints><allowempty>true</allowempty></constraints>
+					<control type="edit" format="string"><heading>32034</heading></control>
+				</setting>
+				<setting id="lidarr_key" type="string" label="32035" help="32047">
+					<level>0</level>
+					<default></default>
+					<constraints><allowempty>true</allowempty></constraints>
+					<control type="edit" format="string"><heading>32035</heading><hidden>true</hidden></control>
+				</setting>
+			</group>
+			<group id="arrgeneral" label="32030">
+				<setting id="arr_days" type="integer" label="32036">
+					<level>0</level>
+					<default>60</default>
+					<constraints><minimum>7</minimum><step>1</step><maximum>365</maximum></constraints>
+					<control type="slider" format="integer"><popup>false</popup></control>
+				</setting>
+				<setting id="arr_read" type="action" label="32037">
+					<level>0</level>
+					<data>RunScript(script.aeon.helper,arr)</data>
+					<constraints><allowempty>true</allowempty></constraints>
+					<control type="button" format="action"><close>true</close></control>
+				</setting>
+			</group>
+		</category>
+	</section>
+</settings>
