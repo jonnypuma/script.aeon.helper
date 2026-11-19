@@ -1,5 +1,7 @@
 # Aeon Fuse Helper (script.aeon.helper)
 
+**Project page:** [jonnypuma.github.io/#/script.aeon.helper](https://jonnypuma.github.io/#/script.aeon.helper) · **All add-ons and apps by jonnypuma:** [jonnypuma.github.io](https://jonnypuma.github.io/)
+
 The helper add-on of the [Aeon Fuse](../skin.aeon.fuse) skin. The skin requires it. It works out what a Kodi skin
 cannot do in XML and hands the results to the skin, mostly as `Window(Home)` properties and skin strings. Under
 another skin its service does nothing.
