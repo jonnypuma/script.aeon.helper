@@ -90,6 +90,11 @@ def sync():
         return
     try:
         if apply():
+            # 0.3.125 (skin 0.56.55): during the start-up splash the reload must not end it ("splash screen closed
+            # before spotlight was fully loaded"); Home keeps it over the reload and waits again
+            home = xbmcgui.Window(10000)
+            if home.getProperty('aeon.splash'):
+                home.setProperty('aeon.splash.keep', '1')
             xbmc.executebuiltin('ReloadSkin()')
     except Exception as error:
         xbmc.log('script.aeon.helper: fonts: %r' % (error,), xbmc.LOGWARNING)

@@ -3,6 +3,10 @@
 The helper is released together with the skin. Each version below names the skin version it came with. The skin's
 `CHANGELOG.md` tells the whole story of each feature. Versions not listed here have no note of their own there.
 
+## 0.3.125
+- Fonts after a skin update (skin 0.56.55): the skin reload that writes your fonts into the fresh Font.xml no longer
+  ends the start-up splash (fontpick.sync sets aeon.splash.keep first).
+
 ## 0.3.124
 - Recommended add-ons (skin 0.56.54): TinyPPI only on CoreELEC; elsewhere its row says "CoreELEC only", it is not
   counted in n / 15 and the setup wizard does not install it (recommended.fits).
