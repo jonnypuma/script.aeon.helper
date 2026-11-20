@@ -1,6 +1,9 @@
-# Aeon Fuse Helper (script.aeon.helper)
-
-**Project page:** [jonnypuma.github.io/#/script.aeon.helper](https://jonnypuma.github.io/#/script.aeon.helper) · **All add-ons and apps by jonnypuma:** [jonnypuma.github.io](https://jonnypuma.github.io/)
+<div align="center">
+  <img src="https://jonnypuma.github.io/assets/script.aeon.helper/icon.webp" width="140" alt="Aeon Fuse Helper">
+  <h1>Aeon Fuse Helper</h1>
+  <p><b>The helper add-on of the Aeon Fuse skin. The skin requires it.</b></p>
+  <p><a href="https://jonnypuma.github.io/#/script.aeon.helper"><b>Project page</b></a> · <a href="https://jonnypuma.github.io/"><b>All add-ons and apps by jonnypuma</b></a> · <a href="https://jonnypuma.github.io/#/skin.aeon.fuse"><b>Aeon Fuse skin</b></a> · <a href="https://jonnypuma.github.io/#install"><b>Install from the Skippy Repo</b></a></p>
+</div>
 
 The helper add-on of the [Aeon Fuse](../skin.aeon.fuse) skin. The skin requires it. It works out what a Kodi skin
 cannot do in XML and hands the results to the skin, mostly as `Window(Home)` properties and skin strings. Under
@@ -11,6 +14,19 @@ another skin its service does nothing.
 - Optional: TMDb Helper (`plugin.video.themoviedb.helper`) for the Planner and the online lists, and the KarmaMole
   Skin Helper (`script.karmamole.helper`) for the artwork colours. Each feature only appears when its add-on is installed.
 
+It comes with the skin: Kodi installs it as the skin's dependency when you install Aeon Fuse from the Skippy Repo.
+
+## What you see because of it
+
+The helper has no window of its own; it feeds the skin. Click a picture for the full size.
+
+<table>
+  <tr>
+    <td width="33%" align="center" valign="top"><a href="https://jonnypuma.github.io/assets/skin.aeon.fuse/aeon/planner_watching.webp"><img src="https://jonnypuma.github.io/assets/skin.aeon.fuse/aeon/t/planner_watching.webp" alt="The Planner: upcoming episodes and films, read from TMDb Helper"></a><br><sub>The Planner: upcoming episodes and films, read from TMDb Helper</sub></td>
+    <td width="33%" align="center" valign="top"><a href="https://jonnypuma.github.io/assets/skin.aeon.fuse/aeon/home_01_movies.webp"><img src="https://jonnypuma.github.io/assets/skin.aeon.fuse/aeon/t/home_01_movies.webp" alt="The Home spotlight: the ratings of the focused item and the studio logo"></a><br><sub>The Home spotlight: the ratings of the focused item and the studio logo</sub></td>
+    <td width="33%" align="center" valign="top"><a href="https://jonnypuma.github.io/assets/skin.aeon.fuse/aeon/wizard_welcome.webp"><img src="https://jonnypuma.github.io/assets/skin.aeon.fuse/aeon/t/wizard_welcome.webp" alt="The setup wizard's first page; the helper does its finishing step"></a><br><sub>The setup wizard's first page; the helper does its finishing step</sub></td>
+  </tr>
+</table>
 ## What it does
 
 ### Service (`service.py`, runs while Kodi runs)
