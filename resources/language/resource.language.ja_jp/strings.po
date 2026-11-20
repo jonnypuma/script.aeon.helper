@@ -187,3 +187,23 @@ msgstr "ネットワーク上のアプリのアドレス（例 http://192.168.0.
 msgctxt "#32047"
 msgid "Settings > General > Security in the app. It is sent only to this address."
 msgstr "アプリの 設定 > 一般 > セキュリティ。このアドレスにだけ送られます。"
+
+msgctxt "#32048"
+msgid "Series premiere"
+msgstr "シリーズ初回"
+
+msgctxt "#32049"
+msgid "Season premiere"
+msgstr "シーズン初回"
+
+msgctxt "#32050"
+msgid "Mid-season finale"
+msgstr "シーズン中盤フィナーレ"
+
+msgctxt "#32051"
+msgid "Season finale"
+msgstr "シーズンフィナーレ"
+
+msgctxt "#32052"
+msgid "Series finale"
+msgstr "シリーズ最終回"

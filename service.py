@@ -19,19 +19,32 @@ import logocache
 import menufile
 import nextaired
 import searchhist
+import searchwin
+import smoothprog
+import timeleft
+import addonart
+import musicbio
+import epcomb
+import focusart
+import setrow
+import guiread
 import videocache
-from resources.lib import backdrops, boxart, cinema, dvprofile, planner
+from resources.lib import backdrops, boxart, cinema, dvprofile, mediainfo, multiep, planner
+from resources.lib import round3          # 0.3.118: round-3 Fused Glass style windows
+from resources.lib import fgsfacts        # 0.3.117: facts for the Fused Glass style windows
+from resources.lib import skchapters      # 0.3.112: Skippy's segments as chapters on the player's bar
 from resources.lib.counts import album_counts, album_tracks, fetch_counts
 from resources.lib.episodes import fetch_epmark
 from resources.lib.headline import bold_last
 from resources.lib.ratings import NAMES, fetch_ratings
 from resources.lib.themes import find_theme
-from resources.lib.uptime import short as short_uptime
+from resources.lib.uptime import short as short_uptime, from_seconds, system_seconds, health as read_health
+from resources.lib import sysinfo
 
 PREFIX = 'aeon.count.'
 RATING_PREFIX = 'aeon.r.'
 # containers the skin reads by number (Home spotlight / strips, set and version panes)
-CONTAINERS = (9301, 9302, 9421, 9422, 5221, 5241, 5224, 5244, 5104, 5101, 9441)
+CONTAINERS = (9301, 9302, 9421, 9422, 5221, 5241, 5224, 5244, 5104, 5101, 9441, 538)   # 538: Episode combined (0.3.75)
 COUNT_INTERVAL = 600
 POLL = 0.3
 
@@ -43,8 +56,11 @@ def rpc(method, params):
 
 def publish():
     home = xbmcgui.Window(10000)
+    language = xbmc.getLanguage(xbmc.ISO_639_1)
     for name, value in fetch_counts(rpc).items():
         home.setProperty(PREFIX + name, str(value))
+        # 0.3.73 Fused Home > System: the same number with a thousands separator (aeon.countg.movies = "6,123")
+        home.setProperty('aeon.countg.' + name, sysinfo.grouped(value, language))
 
 
 def player_key():
@@ -64,6 +80,19 @@ def publish_ratings(ratings, container=None):
     prefix = RATING_PREFIX if container is None else '%s%s.' % (RATING_PREFIX, container)
     for name in NAMES:
         home.setProperty(prefix + name, ratings.get(name, ''))
+
+
+def sync_palbase(state):
+    """Skin.String(aeon.palbase): the name of the palette in use without its scope ("Nord" for "Nord (menus)"), for the
+    skin's label (Aeon_PaletteName). Kept in step here too, for a palette chosen in Kodi's own Colours list."""
+    value = xbmc.getInfoLabel('Skin.CurrentColourTheme')
+    if value == state.get('colours'):
+        return
+    state['colours'] = value
+    from resources.lib import palscope
+    name = palscope.split(value)[0]
+    if name != xbmc.getInfoLabel('Skin.String(aeon.palbase)'):
+        xbmc.executebuiltin('Skin.SetString(aeon.palbase,%s)' % name)
 
 
 def sync_theme(state):
@@ -139,6 +168,9 @@ def refresh_artists(monitor, force=False):
 
 
 ART_GUARD = artguard.Guard()
+TIME_LEFT = timeleft.TimeLeft()          # "x min left" on list rows (skin 0.56.8)
+ADDON_ART = addonart.AddonArt()          # add-on screenshots / settings fanart (skin 0.56.9)
+MUSIC_BIO = musicbio.MusicBio()          # album / artist bio for albums and song lists (skin 0.56.11)
 
 
 class Monitor(xbmc.Monitor):
@@ -146,6 +178,8 @@ class Monitor(xbmc.Monitor):
         # library art with the wrong shape (a landscape picture as a season poster): checked once Kodi is quiet
         if method == 'VideoLibrary.OnUpdate':
             ART_GUARD.queue(data)
+        if method in ('VideoLibrary.OnUpdate', 'VideoLibrary.OnRemove', 'Player.OnStop'):
+            TIME_LEFT.wake()
 
     def onScanFinished(self, library):
         publish()
@@ -153,12 +187,15 @@ class Monitor(xbmc.Monitor):
             refresh_artists(self, force=True)
         if library == 'video':
             refresh_videos(self, force=True)
+            TIME_LEFT.wake()
 
     def onCleanFinished(self, library):
         publish()
 
 
-VIEW_OPTIONS = ('ratings', 'mediainfo', 'plot', 'bg', 'strip', 'bgs', 'bio', 'art', 'counts', 'watched', 'trailer')
+VIEW_OPTIONS = ('ratings', 'mediainfo', 'plot', 'bg', 'strip', 'bgs', 'bio', 'art', 'counts', 'watched', 'trailer', 'boxbg', 'rings', 'logos',
+                'fop', 'fblur', 'ftint',          # 0.3.108 (skin 0.56.42): the library fanart's opacity / blur / tint per view
+                'pshadow', 'pop', 'pblur', 'ptint')    # 0.3.111 (skin 0.56.45): the panels' shadow / opacity / blur / tint per view
 
 
 def publish_view_options(shown):
@@ -317,6 +354,16 @@ class BoxColours(object):
 BOX = BoxColours()
 
 
+def focus_item():
+    """In a library window ListItem is always the view's own list, also while the focus is in a second list of the view
+    (the episodes of Combined, the Season list or Episode combined): then that list's item, when it holds library items
+    (skin 0.51.0: Backdrop = Colors follows the episode thumbs there)."""
+    cid = xbmc.getInfoLabel('System.CurrentControlId')
+    if cid.isdigit() and xbmc.getInfoLabel('Container(%s).ListItem.DBType' % cid):
+        return 'Container(%s).ListItem' % cid
+    return 'ListItem'
+
+
 def sync_karmamole(state):
     """Artwork colours from the KarmaMole helper (if installed).
     - 'colours': the clock / count / strip boxes of the library views take the colour of the focused item's POSTER
@@ -335,7 +382,9 @@ def sync_karmamole(state):
         home.getProperty('aeon.vo.bg') == 'color' or
         (not home.getProperty('aeon.vo.bg') and 'color' in [xbmc.getInfoLabel('Skin.String(aeon.vbg%s)' % x)
                                                            for x in ('', '.movies', '.tv', '.music')]))
-    wash = installed and (page or 'color' in [xbmc.getInfoLabel('Skin.String(aeon.%s)' % x) for x in ('ssbg', 'spbg', 'wsbg')])
+    # the Fused Glass Planner with Background = Colors (0.3.76): KarmaMole makes the soft colour picture of its list too
+    planner = xbmc.getCondVisibility('Window.IsActive(1168) + Skin.HasSetting(aeon.fglass) + String.IsEmpty(Skin.String(aeon.planner.bg))')
+    wash = installed and (page or planner or 'color' in [xbmc.getInfoLabel('Skin.String(aeon.%s)' % x) for x in ('ssbg', 'spbg', 'wsbg')])
     want = ','.join(name for name, on in (('colours', boxes or wash), ('softart', wash)) if on)
     if home.getProperty('KarmaMole.Helper.Features') != want:
         home.setProperty('KarmaMole.Helper.Features', want)
@@ -343,8 +392,9 @@ def sync_karmamole(state):
     artcol = soft = ''
     if (boxes or page) and in_library:
         art = ''
-        for key in boxart.art_keys(xbmc.getInfoLabel('ListItem.DBType')):
-            art = xbmc.getInfoLabel('ListItem.Art(%s)' % key)
+        item = focus_item()
+        for key in boxart.art_keys(xbmc.getInfoLabel('%s.DBType' % item)):
+            art = xbmc.getInfoLabel('%s.Art(%s)' % (item, key))
             if art:
                 break
         now = time.time()
@@ -387,6 +437,14 @@ def sync_spot_container(state):
             cid = xbmc.getInfoLabel('System.CurrentControlId')
             if boxart.is_widget_list(cid):
                 want = cid
+    elif xbmc.getCondVisibility('Window.IsActive(1168) + Skin.HasSetting(aeon.fglass) + String.IsEmpty(Skin.String(aeon.planner.bg))'):
+        # Fused Glass Planner, Background = Colors (0.3.74): the list in focus, else the selected day's column
+        cid = xbmc.getInfoLabel('System.CurrentControlId')
+        if cid not in ('9500',) + tuple(str(9510 + n) for n in range(1, 8)):
+            col = xbmcgui.Window(10000).getProperty('aeon.planner.col') or '1'
+            cid = '9500' if xbmcgui.Window(10000).getProperty('aeon.planner.mode') == 'day' else str(9510 + int(col))
+        if xbmc.getCondVisibility('Integer.IsGreater(Container(%s).NumItems,0)' % cid):
+            want = cid
     elif xbmc.getCondVisibility('Window.IsActive(home) + String.IsEqual(Skin.String(aeon.spbg),color)'):
         cid = boxart.spot_list(xbmc.getInfoLabel('Container(9000).ListItem.Label2'))
         if cid and xbmc.getCondVisibility('Integer.IsGreater(Container(%d).NumItems,0)' % cid):
@@ -399,10 +457,12 @@ def sync_spot_container(state):
     state['spot'] = want
 
 
-SPOT_SECTIONS = ('movies', 'tv', 'music', 'custom1', 'custom2', 'custom3')
+SPOT_SECTIONS = ('movies', 'tv', 'music') + tuple('custom%d' % k for k in range(1, 11))      # ten custom items since 0.3.86
 # custom spotlights (0.3.61): the heading by sort, from the skin's templates 32433-32439 ("Random %s"), %s = item name
 CUSTOM_HEAD_IDS = {'random': 32433, 'dateadded': 32434, 'lastplayed': 32435, 'rating': 32436, 'playcount': 32437,
                    'year': 32438, 'title': 32439}
+# what the skin's spotlight list holds while "Home spotlight: recently watched sets" applies (Aeon_SP2List_<sec>)
+RECENT_SETS = 'plugin://script.aeon.helper/?info=recentsets'
 
 
 def custom_head(sec):
@@ -417,6 +477,8 @@ def custom_head(sec):
     if not name:
         return ''
     sort = xbmc.getInfoLabel('Skin.String(aeon.sp2.%s.sort)' % sec) or 'random'
+    if xbmc.getInfoLabel('$VAR[Aeon_SP2List_%s]' % sec).startswith(RECENT_SETS):
+        sort = 'lastplayed'          # "Home spotlight: recently watched sets" is on for this item (skin 0.45.2)
     try:
         import xbmcaddon
         tpl = xbmcaddon.Addon('skin.aeon.fuse').getLocalizedString(CUSTOM_HEAD_IDS.get(sort, 32433))
@@ -549,7 +611,7 @@ def migrate_settings():
     xbmc.executebuiltin('Skin.SetBool(aeon.migrated)')
 
 
-ROWS = 9            # rows of the Artist rows view (list 532)
+ROWS = 10           # rows of the Artist rows view (list 532; ten in Fused Glass, 0.3.80)
 
 
 def publish_row_counts(counts, shown):
@@ -573,18 +635,34 @@ TRACK_ROWS = 5
 
 def publish_track_counts(cache, shown):
     """Music Fanart list (513) of albums: the track count of the album on each screen row -> aeon.tc.<row>, and of the
-    focused one -> aeon.tc.focus (skin 0.34.0). Counted once per album and kept."""
+    focused one -> aeon.tc.focus (skin 0.34.0). Counted once per album and kept. Album list (532, skin 0.56.8, the list
+    row rule: the track count at the right of every album row): aeon.tc532.<row> for its ROWS screen rows."""
     home = xbmcgui.Window(10000)
     active = xbmc.getCondVisibility('Window.IsActive(music) + Control.IsVisible(513) + Container.Content(albums)')
+    active532 = xbmc.getCondVisibility('Window.IsActive(music) + Control.IsVisible(532) + Container.Content(albums)')
+    # skin 0.56.14: the focused album's count for the info strip of the Album wall, Cover showcase and Artist wall
+    # (530 / 531 / 534) too
+    other = 0
+    if not (active or active532) and xbmc.getCondVisibility('Window.IsActive(music) + Container.Content(albums)'):
+        other = next((cid for cid in (530, 531, 534) if xbmc.getCondVisibility('Control.IsVisible(%d)' % cid)), 0)
     values = {}
     for row in range(TRACK_ROWS):
         values['aeon.tc.%d' % row] = ''
+    for row in range(ROWS):
+        values['aeon.tc532.%d' % row] = ''
     values['aeon.tc.focus'] = ''
-    if active:
+    if active or active532 or other:
         if len(cache) > 5000:
             cache.clear()
-        wanted = [('aeon.tc.%d' % row, xbmc.getInfoLabel('Container(513).ListItemPosition(%d).DBID' % row)) for row in range(TRACK_ROWS)]
-        wanted.append(('aeon.tc.focus', xbmc.getInfoLabel('Container(513).ListItem.DBID')))
+        wanted = []
+        if active:
+            wanted = [('aeon.tc.%d' % row, xbmc.getInfoLabel('Container(513).ListItemPosition(%d).DBID' % row)) for row in range(TRACK_ROWS)]
+            wanted.append(('aeon.tc.focus', xbmc.getInfoLabel('Container(513).ListItem.DBID')))
+        elif other:
+            wanted = [('aeon.tc.focus', xbmc.getInfoLabel('Container(%d).ListItem.DBID' % other))]
+        else:
+            wanted = [('aeon.tc532.%d' % row, xbmc.getInfoLabel('Container(532).ListItemPosition(%d).DBID' % row)) for row in range(ROWS)]
+            wanted.append(('aeon.tc.focus', xbmc.getInfoLabel('Container(532).ListItem.DBID')))
         for name, dbid in wanted:
             if not dbid.isdigit():
                 continue
@@ -636,13 +714,209 @@ def publish_spot_logo(state):
 
 
 def publish_uptime(shown):
-    """Uptime as 8d 15h 2m -> Window(Home).Property(aeon.uptime / aeon.totaluptime)."""
+    """Uptime as 8d 15h 2m -> Window(Home).Property(aeon.uptime / aeon.totaluptime), and how long the machine itself has
+    been on (0.3.73, Fused Home > Power / System): aeon.boxuptime."""
     home = xbmcgui.Window(10000)
     for name, label in (('aeon.uptime', 'System.Uptime'), ('aeon.totaluptime', 'System.TotalUptime')):
         value = short_uptime(xbmc.getInfoLabel(label))
         if shown.get(name) != value:
             shown[name] = value
             home.setProperty(name, value)
+    value = from_seconds(system_seconds())
+    if shown.get('aeon.boxuptime') != value:
+        shown['aeon.boxuptime'] = value
+        home.setProperty('aeon.boxuptime', value)
+    # Fused Home > System (0.3.73): memory ring, memory text, the status pill and the processor (every 2 s), the
+    # Kodi / OS / screen lines (every 30 s)
+    now = time.time()
+    if now - shown.get('_health', 0) < 2:
+        return
+    shown['_health'] = now
+    publish_sysinfo(home, shown, now)
+    status, pct, mem = read_health(xbmc.getInfoLabel('System.Memory(used.percent)'), xbmc.getInfoLabel('System.Memory(used)'),
+                                   xbmc.getInfoLabel('System.Memory(total)'), xbmc.getInfoLabel('System.CPUTemperature'),
+                                   xbmc.getInfoLabel('System.GPUTemperature'))
+    cpu = sysinfo.cpu_average(xbmc.getInfoLabel('System.CPUUsage'))
+    for name, val in (('aeon.health', status), ('aeon.mem.pct', pct), ('aeon.mem.text', mem), ('aeon.cpu.pct', cpu)):
+        if shown.get(name) != val:
+            shown[name] = val
+            home.setProperty(name, val)
+
+
+def publish_sysinfo(home, shown, now):
+    """Fused Home > System, the This box card: aeon.sys.major ("22"), aeon.sys.tag ("RC2"), aeon.sys.osname
+    ("CoreELEC"), aeon.sys.osline ("CoreELEC 22 Piers nightly, 13 November"), aeon.sys.device ("CoreELECAM9Pro") and
+    aeon.sys.screen ("2160p · 24 Hz"). Read every 30 s (the screen mode can change)."""
+    if now - shown.get('_sysinfo', 0) < 30:
+        return
+    shown['_sysinfo'] = now
+    busy = xbmc.getLocalizedString(503)              # "Busy": Kodi is still working the label out, ask again in 3 s
+    labels = dict((key, xbmc.getInfoLabel(key)) for key in ('System.BuildVersionShort', 'System.OSVersionInfo',
+                                                            'System.FriendlyName', 'System.ScreenResolution'))
+    for key, value in labels.items():
+        if busy and value == busy:
+            labels[key] = ''
+            shown['_sysinfo'] = now - 27
+    number, tag = sysinfo.major(labels['System.BuildVersionShort'])
+    months = [xbmc.getLocalizedString(21 + i) for i in range(12)]
+    osname, osline = sysinfo.os_line(labels['System.OSVersionInfo'], months if all(months) else None)
+    values = (('aeon.sys.major', number), ('aeon.sys.tag', tag), ('aeon.sys.osname', osname), ('aeon.sys.osline', osline),
+              ('aeon.sys.device', sysinfo.device(labels['System.FriendlyName'])),
+              ('aeon.sys.screen', sysinfo.screen(labels['System.ScreenResolution'])))
+    for name, val in values:
+        if not val and shown.get(name):              # a label that went Busy keeps what was read before
+            continue
+        if shown.get(name) != val:
+            shown[name] = val
+            home.setProperty(name, val)
+
+
+class OsdAlbum(object):
+    """0.3.111 (skin 0.56.45): the album track list in the music player controls follows the playing library song
+    (resources/lib/osdalbums.py); while another album of the artist is shown, a new song only updates "playing"."""
+
+    def __init__(self):
+        self.open = False
+        self.song = ''
+
+    def tick(self):
+        is_open = bool(xbmc.getCondVisibility('Window.IsActive(musicosd) + Integer.IsGreater(MusicPlayer.DBID,0)'))
+        song = xbmc.getInfoLabel('MusicPlayer.DBID') if is_open else ''
+        if not is_open:
+            self.open, self.song = False, ''
+            return
+        if self.open and song == self.song:
+            return
+        from resources.lib import osdalbums
+        home = xbmcgui.Window(10000)
+        try:
+            if not self.open or home.getProperty('aeon.osd.alb.playing') or not home.getProperty('aeon.osd.alb.id'):
+                osdalbums.follow_song(song)
+            else:
+                albumid, _artist = osdalbums.song_album(song)
+                home.setProperty('aeon.osd.alb.playing', '1' if str(albumid) == home.getProperty('aeon.osd.alb.id') else '')
+        except Exception as error:
+            xbmc.log('[script.aeon.helper] osd album: %s' % error, xbmc.LOGINFO)
+        self.open, self.song = True, song
+
+
+class StartItem(object):
+    """0.3.111 (skin 0.56.45) Skin settings > Home menu > Start on (Skin.String(aeon.startitem) = a Home menu key): once
+    per start, when the start-up splash has gone (Window(Home).Property(aeon.splash) empty, Home open, its menu filled),
+    the Home menu moves to that item. Home's items carry their key as Label2; read over JSON-RPC (main thread)."""
+    CHECK_S = 0.5
+
+    def __init__(self):
+        self.done = False
+        self.next_check = 0
+        self.ready_since = 0
+
+    @staticmethod
+    def rpc(method, params):
+        import json
+        return json.loads(xbmc.executeJSONRPC(json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': method,
+                                                          'params': params}))).get('result') or {}
+
+    def tick(self):
+        if self.done:
+            return
+        now = time.time()
+        if now < self.next_check:
+            return
+        self.next_check = now + self.CHECK_S
+        key = xbmc.getInfoLabel('Skin.String(aeon.startitem)')
+        if not key or xbmc.getSkinDir() != 'skin.aeon.fuse':
+            self.done = bool(xbmc.getCondVisibility('Window.IsActive(home)')) and not key
+            return
+        if not xbmc.getCondVisibility('Window.IsActive(home) + Integer.IsGreater(Container(9000).NumItems,0) + '
+                                      'String.IsEmpty(Window(Home).Property(aeon.splash)) + Control.HasFocus(9000)'):
+            self.ready_since = 0
+            return
+        if not self.ready_since:
+            self.ready_since = now
+            return
+        if now - self.ready_since < 1.0:      # the splash's own SetFocus(9000) first
+            return
+        self.done = True
+        count = int(xbmc.getInfoLabel('Container(9000).NumItems') or 0)
+        labels = ['Container(9000).ListItemAbsolute(%d).Label2' % i for i in range(count)]
+        got = self.rpc('XBMC.GetInfoLabels', {'labels': labels})
+        for i, name in enumerate(labels):
+            if got.get(name) == key:
+                xbmc.executebuiltin('SetFocus(9000,%d,absolute)' % i)
+                xbmc.log('[script.aeon.helper] Start on: %s (item %d)' % (key, i), xbmc.LOGINFO)
+                return
+
+
+class HomePreload(object):
+    """Skin 0.56.4: Home's strips under Movies, TV shows and Music (9301-9303) load one after another after Kodi starts,
+    so Down on those items finds them ready. A section loads once Window(Home) aeon.pl.<sec> is set; the skin sets it
+    at once for the item that gets the focus (Timers.xml aeonhomearm) and then keeps that strip's titles. Here the next
+    one is set when the last one is in (titles, or empty and quiet for 4 s, or 30 s), and only while Home is the open
+    window (the lists of a closed window do not load), no dialog has the focus and no video plays.
+    0.3.111 (skin 0.56.45): a section the skin armed first (Home opened on TV shows) is waited for too, not skipped, and
+    each section that is in gets aeon.pl.<sec>.in: the start-up splash waits for those (it used to end after Movies,
+    with TV shows still loading)."""
+    ORDER = (('movies', 9301, 93911), ('tv', 9302, 93912), ('music', 9303, 93913))
+    WAIT_S = 30
+    CHECK_S = 0.5
+    QUIET = 8                            # 4 s empty and not loading: an empty section (the node list may start late)
+
+    def __init__(self):
+        self.done = False
+        self.current = None
+        self.since = 0
+        self.quiet = 0
+        self.next_check = 0
+        self.checked = set()
+
+    def loaded(self, strip, node):
+        if xbmc.getCondVisibility('Container(%d).IsUpdating | Container(%d).IsUpdating' % (node, strip)):
+            self.quiet = 0
+            return False
+        if xbmc.getCondVisibility('Integer.IsGreater(Container(%d).NumItems,0)' % strip):
+            return True
+        self.quiet += 1                  # empty and not loading: an empty section, or the step between the two lists
+        return self.quiet >= self.QUIET
+
+    def tick(self):
+        if self.done:
+            return
+        now = time.time()
+        if now < self.next_check:
+            return
+        self.next_check = now + self.CHECK_S
+        if xbmc.getSkinDir() != 'skin.aeon.fuse':
+            return
+        # Container(id) reads the window that has the focus: a dialog over Home (CoreELEC's release notes after an
+        # update are not even modal) has none of these lists, so Home's menu list must be readable
+        if not xbmc.getCondVisibility('Window.IsActive(home) + Integer.IsGreater(Container(9000).NumItems,0) + '
+                                      '!Player.HasVideo'):
+            self.since = now             # the wait counts only while the lists can load and be read
+            self.quiet = 0
+            return
+        home = xbmcgui.Window(10000)
+        if self.current:
+            sec, strip, node = self.current
+            if not self.loaded(strip, node) and now - self.since < self.WAIT_S:
+                return
+            xbmc.log('[script.aeon.helper] Home %s strip in after %.1f s (%s items)'
+                     % (sec, now - self.since, xbmc.getInfoLabel('Container(%d).NumItems' % strip)), xbmc.LOGINFO)
+            home.setProperty('aeon.pl.%s.in' % sec, '1')
+            self.checked.add(sec)
+            self.current = None
+        # one at a time: a section that is still loading (the skin armed the focused one) goes first
+        loading = [item for item in self.ORDER if item[0] not in self.checked and xbmc.getCondVisibility(
+            'Container(%d).IsUpdating | Container(%d).IsUpdating' % (item[1], item[2]))]
+        for item in loading + [item for item in self.ORDER if item not in loading]:
+            if item[0] in self.checked:
+                continue
+            if not home.getProperty('aeon.pl.%s' % item[0]):
+                home.setProperty('aeon.pl.%s' % item[0], '1')
+            self.current, self.since, self.quiet = item, now, 0
+            return
+        self.done = True
+        home.setProperty('aeon.pl.done', '1')   # skin 0.56.20: the start-up splash's Home rows step
 
 
 class Cinema(xbmc.Player):
@@ -751,7 +1025,8 @@ class ArtTypeWatch(object):
     def tick(self):
         if self.thread is not None and self.thread.is_alive():
             return
-        if xbmc.getCondVisibility(self.OPEN + ' + !String.IsEmpty(Container(6).ListItem.Property(type))'):
+        # the dialogs first (a plain read), the picker's item only while they are up (a main-thread read, guiread.py)
+        if xbmc.getCondVisibility(self.OPEN) and xbmc.getCondVisibility('!String.IsEmpty(Container(6).ListItem.Property(type))'):
             self.thread = threading.Thread(target=self.follow, name='aeon-arttype')
             self.thread.start()
 
@@ -882,6 +1157,208 @@ class DolbyVision(object):
             self.busy.add(path)
             threading.Thread(target=self.read, args=(path,)).start()
 
+
+class MediaInfoSidecar(object):
+    """0.3.97 Skin settings > Details > Media info from sidecars (Skin.HasSetting(aeon.mi.sidecar), off by default): the
+    mediainfo sidecar of the film / episode in focus (Curator Media Manager's <name>.cmm_mediainfo.xml first, else
+    tinyMediaManager's <name>-mediainfo.xml) is read once in a thread and remembered; aeon.mi.<key> holds what it says
+    and aeon.mi.path the file it belongs to (the skin shows the values only while that is ListItem.FileNameAndPath)."""
+    KEYS = ('from', 'source', 'format', 'vsource', 'vcodec', 'edition', 'res', 'hdr', '3d', 'video', 'container', 'size', 'bitrate', 'audio', 'audio.count',
+            'audio.list', 'commentary', 'subs.count', 'subs.langs', 'sdh', 'chapters')
+    TYPES = ('movie', 'episode', 'musicvideo')
+
+    def __init__(self):
+        self.seen = None
+        self.known = {}
+        self.busy = set()
+
+    def publish(self, path, values):
+        home = xbmcgui.Window(10000)
+        for key in self.KEYS:
+            home.setProperty('aeon.mi.' + key, values.get(key, '') if values else '')
+        home.setProperty('aeon.mi.path', path if values else '')
+
+    @staticmethod
+    def language(code):
+        try:
+            return xbmc.convertLanguage(code, xbmc.ENGLISH_NAME) or code
+        except Exception:
+            return code
+
+    def read(self, path):
+        values = {}
+        try:
+            for kind, side in mediainfo.side_paths(path):
+                if not xbmcvfs.exists(side):
+                    continue
+                handle = xbmcvfs.File(side)
+                try:
+                    text = handle.read()
+                finally:
+                    handle.close()
+                info = mediainfo.parse(kind, text)
+                if info:
+                    values = mediainfo.props(info, self.language)
+                    break
+        except Exception as error:                # an unreadable sidecar only means nothing extra
+            xbmc.log('[script.aeon.helper] mediainfo sidecar: %s' % error, xbmc.LOGDEBUG)
+        if len(self.known) > 400:
+            self.known.clear()
+        self.known[path] = values
+        self.busy.discard(path)
+        if self.seen == path:
+            self.publish(path, values)
+
+    # 0.3.114: on Home the spotlight's item is in a list that never has focus (Aeon_Home: 9441 the big spotlight,
+    # 9421-9423 the section spotlights); the sidecar of the one shown there is read when the focused item is no video
+    SPOTS = (9441, 9421, 9422, 9423)
+
+    def focused(self):
+        """(prefix) of the item whose sidecar the skin can show now: the focused list item, else a Home spotlight's"""
+        if xbmc.getInfoLabel('ListItem.DBType') in self.TYPES:
+            return 'ListItem.'
+        if xbmc.getCondVisibility('Window.IsActive(home)'):
+            for cid in self.SPOTS:
+                pfx = 'Container(%d).ListItem.' % cid
+                if xbmc.getCondVisibility('Control.IsVisible(%d)' % cid) and xbmc.getInfoLabel(pfx + 'DBType') in self.TYPES:
+                    return pfx
+        return None
+
+    def tick(self):
+        pfx = self.focused() if xbmc.getCondVisibility('Skin.HasSetting(aeon.mi.sidecar)') else None
+        if not pfx:
+            if self.seen:
+                self.seen = None
+                self.publish('', {})
+            return
+        path = xbmc.getInfoLabel(pfx + 'FileNameAndPath')
+        if path == self.seen:
+            return
+        self.seen = path
+        if path in self.known:
+            self.publish(path, self.known[path])
+        elif path and path not in self.busy:
+            self.busy.add(path)
+            threading.Thread(target=self.read, args=(path,)).start()
+
+class PlayerSidecar(object):
+    """0.3.114 the video playing: its Dolby Vision profile (aeon.pf.dvp, "P8.1") and its mediainfo sidecar
+    (aeon.pf.mi.<key>, the keys of MediaInfoSidecar) for the player's information page ("In this file", Video line),
+    which showed only Kodi's plain "DV". Read once per file in a thread; cleared when no video plays."""
+    KEYS = MediaInfoSidecar.KEYS
+
+    def __init__(self):
+        self.seen = None
+
+    def publish(self, path, dvp, values):
+        home = xbmcgui.Window(10000)
+        home.setProperty('aeon.pf.dvp', dvp or '')
+        for key in self.KEYS:
+            home.setProperty('aeon.pf.mi.' + key, (values or {}).get(key, ''))
+        home.setProperty('aeon.pf.mi.path', path if (dvp or values) else '')
+
+    def read(self, path):
+        dvp, values = '', {}
+        try:
+            nfo_read = False
+            for kind, side in dvprofile.side_paths(path):
+                if kind == 'nfo' and nfo_read:
+                    continue
+                if not xbmcvfs.exists(side):
+                    continue
+                handle = xbmcvfs.File(side)
+                try:
+                    text = handle.read()
+                finally:
+                    handle.close()
+                dvp = dvprofile.label(text) if kind == 'nfo' else dvprofile.label_cmm(text)
+                nfo_read = nfo_read or kind == 'nfo'
+                if dvp:
+                    break
+            for kind, side in mediainfo.side_paths(path):
+                if not xbmcvfs.exists(side):
+                    continue
+                handle = xbmcvfs.File(side)
+                try:
+                    text = handle.read()
+                finally:
+                    handle.close()
+                info = mediainfo.parse(kind, text)
+                if info:
+                    values = mediainfo.props(info, MediaInfoSidecar.language)
+                    break
+        except Exception as error:               # an unreadable side file only means nothing extra
+            xbmc.log('[script.aeon.helper] player sidecar: %s' % error, xbmc.LOGDEBUG)
+        if self.seen == path:
+            self.publish(path, dvp, values)
+
+    def tick(self):
+        if not xbmc.getCondVisibility('Player.HasVideo'):
+            if self.seen:
+                self.seen = None
+                self.publish('', '', {})
+            return
+        path = xbmc.getInfoLabel('Player.FilenameAndPath')
+        if not path or path == self.seen:
+            return
+        self.seen = path
+        self.publish('', '', {})
+        threading.Thread(target=self.read, args=(path,)).start()
+
+
+class JoinEpisodes(object):
+    """0.3.100 Skin settings > Details > Episodes in one file as one row (Skin.HasSetting(aeon.ep.join), off by default):
+    when the Videos window opens a season (videodb://tvshows/titles/<show>/<season>/) that has episodes sharing one
+    file, its list is replaced in place by the helper's (?info=episodes), where those episodes are one row. Replaced, so
+    Back still goes to the seasons. Container.FolderPath / Content read no list item (guiread leaves them plain)."""
+
+    def __init__(self):
+        self.seen = None
+        self.known = {}
+        self.view = None                # (the helper's path, the view the season was shown in)
+
+    def tick(self):
+        if not xbmc.getCondVisibility('Skin.HasSetting(aeon.ep.join) + Window.IsActive(videos) + !Container.IsUpdating'):
+            return
+        path = xbmc.getInfoLabel('Container.FolderPath')
+        if path == 'plugin://script.aeon.helper/':
+            # Back from joined episodes opens the helper's (empty) top level: Kodi's parent of the list's address, the
+            # season being gone from the history (replaced). Go on to where Back means: the seasons, or the shows.
+            home = xbmcgui.Window(10000)
+            parent = home.getProperty('aeon.ep.parent')
+            if parent:
+                home.clearProperty('aeon.ep.parent')
+                xbmc.executebuiltin('Container.Update("%s",replace)' % parent)
+            return
+        if not xbmc.getCondVisibility('Container.Content(episodes)'):
+            return
+        if self.view and path == self.view[0]:
+            # the season's own view (Kodi keeps a plugin list's view apart: it would open in another one); Kodi then
+            # remembers it for the joined lists
+            xbmc.executebuiltin('Container.SetViewMode(%s)' % self.view[1])
+            self.view = None
+        if path == self.seen:
+            return
+        self.seen = path
+        key = multiep.season_path(path)
+        if not key:
+            return
+        if key not in self.known:
+            params = {'tvshowid': key[0], 'properties': ['file']}
+            if key[1] >= 0:
+                params['season'] = key[1]
+            episodes = (rpc('VideoLibrary.GetEpisodes', params).get('result') or {}).get('episodes') or []
+            if len(self.known) > 200:
+                self.known.clear()
+            self.known[key] = multiep.shared(episodes)
+        if self.known[key]:
+            target = 'plugin://script.aeon.helper/?info=episodes&tvshowid=%d&season=%d' % key
+            view = xbmc.getInfoLabel('System.CurrentControlId')
+            self.view = (target, view) if view.isdigit() and 50 <= int(view) < 10000 and view != '9000' else None
+            xbmc.executebuiltin('Container.Update("%s",replace)' % target)
+            xbmc.log('[script.aeon.helper] episodes of show %d season %d share files: one row each' % key, xbmc.LOGINFO)
+
+
 STUDIO_SOURCES = (('aeon.studio', 'ListItem.Studio'), ('aeon.ss.studio', 'Container(9701).ListItem.Studio'))
 
 
@@ -891,12 +1368,21 @@ def publish_studios(state):
     matches, so a logo never belongs to the item before."""
     from resources.lib import studio
     home = xbmcgui.Window(10000)
+    if 'studio_names' not in state:            # 0.3.92: the logos the studio pack has (read once)
+        path = xbmcvfs.translatePath('special://home/addons/resource.images.studios.white/resources/Textures.xbt')
+        try:
+            state['studio_names'] = studio.xbt_names(path) if os.path.isfile(path) else None
+        except Exception as error:             # an unreadable pack: the first studio, as before
+            xbmc.log('[script.aeon.helper] studio logos: %s' % error, xbmc.LOGINFO)
+            state['studio_names'] = None
     for prop, label in STUDIO_SOURCES:
         full = xbmc.getInfoLabel(label)
         if state.get(prop) == full:
             continue
         state[prop] = full
-        home.setProperty(prop, studio.first(full))
+        logo, text = studio.pick(full, state['studio_names'])
+        home.setProperty(prop, logo)
+        home.setProperty(prop + '.text', text)
         home.setProperty(prop + '.of', full)
 
 
@@ -922,13 +1408,74 @@ def manifest_check():
             return
 
 
+def migrate_fanblur():
+    """0.3.111 (skin 0.56.45): Library fanart blur went from Off / Light / Medium / Strong to Off / -2 .. +2 (0 = the
+    old Light, the default now): Skin settings' and every view's old value moves to the new step, once per start."""
+    import json
+    from resources.lib import blur
+    try:
+        res = json.loads(xbmc.executeJSONRPC(json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': 'Settings.GetSkinSettings'})))
+        moved = 0
+        for item in res.get('result', {}).get('settings', []):
+            sid, value = item.get('id', ''), item.get('value')
+            if sid == 'aeon.x.fblur' or (sid.startswith('aeon.vo.') and sid.endswith('.fblur')):
+                new = blur.fanblur_new(value, view=sid != 'aeon.x.fblur')
+                if new is not None:
+                    xbmc.executeJSONRPC(json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': 'Settings.SetSkinSettingValue',
+                                                    'params': {'setting': sid, 'value': new}}))
+                    moved += 1
+        if moved:
+            xbmc.log('[script.aeon.helper] Library fanart blur: %d old values moved to the new steps' % moved, xbmc.LOGINFO)
+    except Exception as error:
+        xbmc.log('[script.aeon.helper] fanart blur migration: %s' % error, xbmc.LOGINFO)
+
+
+def splash_fanart():
+    """0.3.108 (skin 0.56.42): the start-up splash shows a random film's (else show's) fanart from the library under its
+    veil: Window(Home).Property(aeon.splash.fan). One library call each, in a thread, as the service starts."""
+    for method, key in (('VideoLibrary.GetMovies', 'movies'), ('VideoLibrary.GetTVShows', 'tvshows')):
+        try:
+            got = rpc(method, {'properties': ['art'], 'sort': {'method': 'random'}, 'limits': {'start': 0, 'end': 5}}).get('result')
+        except Exception:
+            continue
+        for item in (got or {}).get(key) or []:
+            fan = (item.get('art') or {}).get('fanart')
+            if fan:
+                xbmcgui.Window(10000).setProperty('aeon.splash.fan', fan)
+                return
+
+
 def run():
+    # 0.3.96: list labels and conditions are read on Kodi's main thread (guiread.py: a Kodi lock-order freeze)
+    guiread.install()
     # one instance only: a newer start (add-on re-enabled / updated) takes over and this one ends
     token = str(time.time())
     xbmcgui.Window(10000).setProperty('aeon.helper.token', token)
+    threading.Thread(target=splash_fanart).start()
+    threading.Thread(target=migrate_fanblur).start()
     monitor = Monitor()
     manifest_check()
     migrate_settings()
+    try:                         # Skin settings > Player > Save lyrics next to the song, as CU LRC Lyrics has it
+        from resources.lib import lyricsave
+        lyricsave.sync()
+    except Exception as error:
+        xbmc.log('[script.aeon.helper] lyrics save sync: %s' % error, xbmc.LOGINFO)
+    try:                         # 0.3.102: Media info chips count again after new chips joined the picker ("7 / 17")
+        from resources.lib import chips
+        if xbmc.getInfoLabel('Skin.String(aeon.chips.shown)'):
+            now = chips.shown(lambda flag: xbmc.getCondVisibility('Skin.HasSetting(%s)' % flag))
+            if xbmc.getInfoLabel('Skin.String(aeon.chips.shown)') != chips.summary(now):
+                xbmc.executebuiltin('Skin.SetString(aeon.chips.shown,%s)' % chips.summary(now))
+    except Exception as error:
+        xbmc.log('[script.aeon.helper] chips count: %s' % error, xbmc.LOGINFO)
+    try:                         # 0.3.103 Skin style (skin 0.56.27): the library's glass follows the style
+        from resources.lib import skinstyle
+        call = skinstyle.builtin(xbmc.getInfoLabel('Skin.String(aeon.fgmenu)'), xbmc.getInfoLabel('Skin.String(aeon.fgmat)'))
+        if call:
+            xbmc.executebuiltin(call)
+    except Exception as error:
+        xbmc.log('[script.aeon.helper] skin style: %s' % error, xbmc.LOGINFO)
     # the library may still be opening at start-up
     if monitor.waitForAbort(10):
         return
@@ -951,23 +1498,67 @@ def run():
     themes = Themes()
     trailers = Cinema()
     dolby = DolbyVision()
+    sidecars = MediaInfoSidecar()
+    player_sidecar = PlayerSidecar()
+    focus_art = focusart.FocusArt()                # 0.3.108: the focused title's art at once in a big library
+    set_row = setrow.SetRow()                      # 0.3.109: the spotlight's set strip path (a Kodi 22 freeze)
+    join_episodes = JoinEpisodes()
     studios = {}
     memory = MemoryTrim()
     art_types = ArtTypeWatch()
+    smooth_progress = smoothprog.SmoothProgress()   # Now playing: the fill glides (0.3.84)
     chapter_pictures = chapterwin.ChapterPictures()
+    home_preload = HomePreload()
+    start_item = StartItem()
+    osd_album = OsdAlbum()
+    sk_chapters = skchapters.SkippyChapters()
+    fgs_facts = fgsfacts.Facts()
+    round3_facts = round3.Facts()
     palette = {}
     try:
         menufile.ensure_android()
     except Exception as error:               # never let a menu file stop the service
         xbmc.log('[script.aeon.helper] Power row: %s' % error, xbmc.LOGINFO)
+    try:
+        menufile.ensure_custom_nodes()       # custom items 4-10 (skin 0.54.0)
+    except Exception as error:
+        xbmc.log('[script.aeon.helper] custom item nodes: %s' % error, xbmc.LOGINFO)
     refresh_artists(monitor)
     refresh_videos(monitor)
     while not monitor.waitForAbort(POLL):
         if xbmcgui.Window(10000).getProperty('aeon.helper.token') != token:
             return
+        guiread.tick()                           # 0.3.96: last tick's list labels in one main-thread call
+        # 0.3.96: right after the batch, while its focused item is the newest the service has
+        # the item the skin is showing: Home properties follow it (all ratings, not only the default one)
+        key = (xbmc.getInfoLabel('ListItem.DBType'), xbmc.getInfoLabel('ListItem.DBID'))
+        if key != seen:
+            seen = key
+            publish_ratings(fetch_ratings(rpc, *key))
+            searchwin.publish_show(*key)              # Fused Glass Search window: "You're on S3 E1" (0.3.73)
+            try:
+                epcomb.publish_season(*key)           # Fused Glass season views: the next airing (0.3.115)
+            except Exception as error:
+                xbmc.log('[script.aeon.helper] season airing: %s' % error, xbmc.LOGINFO)
+        # the video playing: its ratings for the player overlays (aeon.r.player.*); VideoPlayer.Rating(name) only
+        # ever returns the default rating
+        pkey = player_key()
+        if pkey != seen_player:
+            seen_player = pkey
+            publish_ratings(fetch_ratings(rpc, *pkey) if pkey[1] else {}, 'player')
+        for cid in CONTAINERS:
+            ckey = (xbmc.getInfoLabel('Container(%d).ListItem.DBType' % cid),
+                    xbmc.getInfoLabel('Container(%d).ListItem.DBID' % cid))
+            if seen_containers.get(cid) != ckey:
+                seen_containers[cid] = ckey
+                publish_ratings(fetch_ratings(rpc, *ckey), cid)
+                xbmcgui.Window(10000).setProperty('aeon.epm.%d' % cid, fetch_epmark(rpc, *ckey, upcoming=nextaired.kept('episodes') if ckey[0] == 'episode' else None))
+                if cid == 538:
+                    epcomb.publish_focus(*ckey)
         publish_view_options(shown_options)
         themes.tick()
         sync_theme(palette)
+        sync_palbase(palette)
         if xbmc.Player().isPlaying():                 # playing or paused: the Planner read waits for the quiet after it
             last_played = time.time()
         arrfeed.tick(palette, xbmc.Player().isPlaying())
@@ -976,14 +1567,35 @@ def run():
             refresh_nextaired(monitor, last_played)
         trailers.tick()
         dolby.tick()
+        sidecars.tick()
+        player_sidecar.tick()
+        focus_art.tick()
+        set_row.tick(time.time())
+        join_episodes.tick()
         publish_studios(studios)
         memory.tick()
         art_types.tick()
+        smooth_progress.tick()
         chapter_pictures.tick()
+        home_preload.tick()
+        start_item.tick()
+        osd_album.tick()
+        sk_chapters.tick()
+        try:
+            fgs_facts.tick()
+            round3_facts.tick()
+        except Exception as error:
+            xbmc.log('[script.aeon.helper] fgs facts: %s' % error, xbmc.LOGINFO)
+        TIME_LEFT.tick()
+        ADDON_ART.tick()
+        MUSIC_BIO.tick()
         logocache.tick(palette)
         blurcache.tick(palette)
+        blurcache.frost(palette)                 # 0.3.93: Menu theme Frost, the settings backdrop blurred
         searchhist.tick(palette)
         nextaired.publish_week(palette)
+        nextaired.publish_next(palette)          # 0.3.94: the next episode of the show in an episode / season list
+        nextaired.publish_season_pct(palette)    # 0.3.95: the share of watched episodes of an episode list
         publish_heads(palette)
         check_osd_poster(palette)
         collect_backdrops(palette)
@@ -998,24 +1610,6 @@ def run():
             publish()
             artist_albums = album_counts(rpc)
             last_counts = time.time()
-        # the item the skin is showing: Home properties follow it (all ratings, not only the default one)
-        key = (xbmc.getInfoLabel('ListItem.DBType'), xbmc.getInfoLabel('ListItem.DBID'))
-        if key != seen:
-            seen = key
-            publish_ratings(fetch_ratings(rpc, *key))
-        # the video playing: its ratings for the player overlays (aeon.r.player.*); VideoPlayer.Rating(name) only
-        # ever returns the default rating
-        pkey = player_key()
-        if pkey != seen_player:
-            seen_player = pkey
-            publish_ratings(fetch_ratings(rpc, *pkey) if pkey[1] else {}, 'player')
-        for cid in CONTAINERS:
-            ckey = (xbmc.getInfoLabel('Container(%d).ListItem.DBType' % cid),
-                    xbmc.getInfoLabel('Container(%d).ListItem.DBID' % cid))
-            if seen_containers.get(cid) != ckey:
-                seen_containers[cid] = ckey
-                publish_ratings(fetch_ratings(rpc, *ckey), cid)
-                xbmcgui.Window(10000).setProperty('aeon.epm.%d' % cid, fetch_epmark(rpc, *ckey))
 
 
 if __name__ == '__main__':

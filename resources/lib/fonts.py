@@ -100,6 +100,10 @@ SKIP = ('lyr',)                      # the animated lyrics keep their own displa
 BEGIN = '<!-- sections:begin (written by script.aeon.helper, do not edit) -->'
 END = '<!-- sections:end -->'
 MARK = re.compile(r'<!-- aeon-fonts: (.*?) -->')
+# 0.3.106 (skin 0.56.31): capitals twins uc_st_<name> of these settings fonts, the settings face with style uppercase.
+# The Fused Glass style draws its settings lists in capitals; Kodi's own rows get their text from Kodi, so only a
+# font can capitalise them. Written inside the generated block so they follow the settings font choice.
+CAPS = ('ui_24', 'ui_24_semibold', 'ui_24_bold', 'ui_22_semibold', 'ui_22_bold', 'small_20_semibold')
 
 _MARKLINE = re.compile(r'<!-- aeon-fonts: .*? -->\n?')
 _SET = re.compile(r'(<fontset\b[^>]*>)(.*?)(</fontset>)', re.S)
@@ -188,6 +192,13 @@ def has_bold(family, sets):
     return bool(bold) and bold != (names('ui_24') or names('body_24'))
 
 
+def uppercase(rest):
+    """Rest of a <font> element with style uppercase added to its own style."""
+    if '<style>' in rest:
+        return re.sub(r'<style>([^<]*)</style>', lambda m: '<style>%s uppercase</style>' % m.group(1).strip(), rest, count=1)
+    return rest + '<style>uppercase</style>'
+
+
 def clean(choices, sets):
     """Only known sections, only font sets that exist; '' = follow the font set."""
     out = {}
@@ -233,6 +244,10 @@ def build(text, choices):
                 family = (choices['headings'] or choices[key]) if is_heading(name) else choices[key]
                 rest = family_font(family, name, own, sets)
                 lines.append('\t\t<font><name>%s%s</name>%s</font>' % (prefix, name, rest))
+        for name in CAPS:
+            if name in own:
+                rest = uppercase(family_font(choices['settings'], name, own, sets))
+                lines.append('\t\t<font><name>uc_%s%s</name>%s</font>' % (PREFIX['settings'], name, rest))
         for number, family in enumerate([''] + known):
             for key, name in PREVIEW:
                 if name in own:

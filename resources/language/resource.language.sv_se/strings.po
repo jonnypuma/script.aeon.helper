@@ -187,3 +187,23 @@ msgstr "Appens adress i ditt nätverk, till exempel http://192.168.0.5:7878"
 msgctxt "#32047"
 msgid "Settings > General > Security in the app. It is sent only to this address."
 msgstr "Inställningar > Allmänt > Säkerhet i appen. Den skickas bara till den här adressen."
+
+msgctxt "#32048"
+msgid "Series premiere"
+msgstr "Seriepremiär"
+
+msgctxt "#32049"
+msgid "Season premiere"
+msgstr "Säsongspremiär"
+
+msgctxt "#32050"
+msgid "Mid-season finale"
+msgstr "Midsäsongsfinal"
+
+msgctxt "#32051"
+msgid "Season finale"
+msgstr "Säsongsfinal"
+
+msgctxt "#32052"
+msgid "Series finale"
+msgstr "Seriefinal"

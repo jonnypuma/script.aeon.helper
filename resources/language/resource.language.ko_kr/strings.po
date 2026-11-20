@@ -187,3 +187,23 @@ msgstr "네트워크에 있는 앱의 주소, 예: http://192.168.0.5:7878"
 msgctxt "#32047"
 msgid "Settings > General > Security in the app. It is sent only to this address."
 msgstr "앱의 설정 > 일반 > 보안. 이 주소로만 전송됩니다."
+
+msgctxt "#32048"
+msgid "Series premiere"
+msgstr "시리즈 첫 방송"
+
+msgctxt "#32049"
+msgid "Season premiere"
+msgstr "시즌 첫 방송"
+
+msgctxt "#32050"
+msgid "Mid-season finale"
+msgstr "시즌 중간 피날레"
+
+msgctxt "#32051"
+msgid "Season finale"
+msgstr "시즌 피날레"
+
+msgctxt "#32052"
+msgid "Series finale"
+msgstr "시리즈 피날레"

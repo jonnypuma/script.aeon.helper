@@ -23,3 +23,17 @@ def test_marks():
     assert fetch_epmark(rpc_for(2, 8, 8, 2, 'Continuing'), 'episode', 5) == 'season_finale'
     assert fetch_epmark(rpc_for(1, 3, 8, 2, 'Ended'), 'episode', 5) == ''
     assert fetch_epmark(rpc_for(1, 3, 8, 2, 'Ended'), 'movie', 5) == ''
+
+
+def test_no_finale_while_more_airs():
+    """0.3.115: S3 E6 is the last in the library, E7 airs next week: no season finale"""
+    base = rpc_for(3, 6, 6, 3, 'Continuing')
+
+    def rpc(method, params):
+        if method == 'VideoLibrary.GetTVShowDetails' and 'title' in params.get('properties', []):
+            return {'result': {'tvshowdetails': {'title': 'The Rings of Power'}}}
+        return base(method, params)
+    later = [{'showtitle': 'The Rings of Power', 'season': 3, 'episode': 7, 'premiered': '2026-11-25'}]
+    assert fetch_epmark(rpc, 'episode', 5, upcoming=later) == ''
+    assert fetch_epmark(rpc, 'episode', 5, upcoming=[{'showtitle': 'Other', 'season': 3, 'episode': 7}]) == 'season_finale'
+    assert fetch_epmark(rpc, 'episode', 5, upcoming=[]) == 'season_finale'

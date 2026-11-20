@@ -187,3 +187,23 @@ msgstr "應用程式在你網路中的位址，例如 http://192.168.0.5:7878"
 msgctxt "#32047"
 msgid "Settings > General > Security in the app. It is sent only to this address."
 msgstr "應用程式中的 設定 > 一般 > 安全性。只會傳送到此位址。"
+
+msgctxt "#32048"
+msgid "Series premiere"
+msgstr "影集首播"
+
+msgctxt "#32049"
+msgid "Season premiere"
+msgstr "季首播"
+
+msgctxt "#32050"
+msgid "Mid-season finale"
+msgstr "季中完結"
+
+msgctxt "#32051"
+msgid "Season finale"
+msgstr "季終"
+
+msgctxt "#32052"
+msgid "Series finale"
+msgstr "劇終"

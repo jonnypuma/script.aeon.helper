@@ -165,3 +165,19 @@ class TestWeekCounts(unittest.TestCase):
         self.assertEqual(got[1][1], 0)
         self.assertEqual(got[2], (datetime.date(2026, 11, 15), 1))
         self.assertEqual(sum(c for _, c in got), 3)
+
+
+class Placeholders(unittest.TestCase):
+    def test_text_or_empty(self):
+        from resources.lib.planner import text_or_empty
+        self.assertEqual(text_or_empty('None'), '')
+        self.assertEqual(text_or_empty(None), '')
+        self.assertEqual(text_or_empty(' TBA '), '')
+        self.assertEqual(text_or_empty('A real plot.'), 'A real plot.')
+
+    def test_real_episode_title(self):
+        from resources.lib.planner import real_episode_title
+        for generic in ('Episode 2', 'episode 12', 'Folge 3', 'Aflevering 4', '#5', 'TBA', 'None', '7'):
+            self.assertEqual(real_episode_title(generic), '', generic)
+        self.assertEqual(real_episode_title('The Fight Rages On'), 'The Fight Rages On')
+        self.assertEqual(real_episode_title('Episode 2: The Return'), 'Episode 2: The Return')

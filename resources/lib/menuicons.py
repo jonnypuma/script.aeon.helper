@@ -10,7 +10,7 @@ AF3_DIR = 'icons/af3/'
 # the item's own icon, as the skin's Aeon_H_Icon variable picks it
 DEFAULTS = {
     'movies': 'film', 'tv': 'tv', 'music': 'music', 'search': 'search', 'system': 'settings', 'livetv': 'tv',
-    'power': 'power', 'sets': 'stack', 'pictures': 'sun', 'weather': 'cloud', 'planner': 'clock',
+    'power': 'power', 'sets': 'stack', 'pictures': 'camera', 'weather': 'cloud', 'planner': 'clock',
 }
 
 # player / navigation glyphs of the skin's own set: no use as a menu icon

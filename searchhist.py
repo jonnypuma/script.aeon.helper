@@ -50,10 +50,20 @@ def publish(history):
 
 
 def tick(state):
-    """Called from the service loop: publish once at start, then record queries done in the Search window."""
+    """Called from the service loop: publish once at start, then record queries done in the Search window. Fused Glass
+    (0.3.73): the window types into Window(Home).Property(aeon.q); the last query is recorded when the window closes."""
     if 'search' not in state:
         state['search'] = ''
         publish(load())
+    if xbmc.getCondVisibility('Skin.HasSetting(aeon.fglass)'):
+        if xbmc.getCondVisibility('Window.IsActive(1150)'):
+            state['fused'] = searches.clean(xbmcgui.Window(10000).getProperty('aeon.q'))
+        elif state.get('fused'):
+            query, state['fused'] = state['fused'], ''
+            history = searches.add(load(), query)
+            save(history)
+            publish(history)
+        return
     if not xbmc.getCondVisibility(WATCH):
         state['search'] = ''
         return
@@ -76,6 +86,13 @@ def run(arg):
     try:
         query = history[int(arg) - 1]
     except (ValueError, IndexError):
+        return
+    if xbmc.getCondVisibility('Skin.HasSetting(aeon.fglass)'):
+        # Fused Glass: the window reads its query from aeon.q; aeon.q.keep stops it clearing the query on open
+        home = xbmcgui.Window(10000)
+        home.setProperty('aeon.q', query)
+        home.setProperty('aeon.q.keep', '1')
+        xbmc.executebuiltin('ActivateWindow(1150)')
         return
     xbmc.executebuiltin('ActivateWindow(1150)')
     # the window opens the keyboard by itself when its field is empty; type the query there and press Done

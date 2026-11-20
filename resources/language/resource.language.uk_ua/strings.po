@@ -187,3 +187,23 @@ msgstr "Адреса застосунку у вашій мережі, напри
 msgctxt "#32047"
 msgid "Settings > General > Security in the app. It is sent only to this address."
 msgstr "Налаштування > Загальні > Безпека в застосунку. Надсилається лише на цю адресу."
+
+msgctxt "#32048"
+msgid "Series premiere"
+msgstr "Прем'єра серіалу"
+
+msgctxt "#32049"
+msgid "Season premiere"
+msgstr "Прем'єра сезону"
+
+msgctxt "#32050"
+msgid "Mid-season finale"
+msgstr "Фінал півсезону"
+
+msgctxt "#32051"
+msgid "Season finale"
+msgstr "Фінал сезону"
+
+msgctxt "#32052"
+msgid "Series finale"
+msgstr "Фінал серіалу"

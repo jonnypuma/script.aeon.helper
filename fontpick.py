@@ -156,8 +156,38 @@ def set_choice(key, value):
         xbmc.executebuiltin('Skin.Reset(aeon.font.%s)' % key)
 
 
-def pick():
-    """Font combinations first (each with a mock-up in its two fonts); the last row opens the per-section list."""
+def font_name():
+    """the font combination in use (its name), or Fonts per section"""
+    key = fonts.preset_of(choices())
+    for preset in fonts.PRESETS:
+        if preset[0] == key:
+            return preset[1]
+    return text(31838, 'Fonts per section')
+
+
+def set_preset(key):
+    """setup wizard > Font combination (skin 0.56.40): a combination by its key (fonts.PRESETS); Font.xml waits for the
+    wizard's Finish"""
+    for preset_key, _name, heading, body in fonts.PRESETS:
+        if preset_key == key:
+            for section, value in fonts.preset_choices(heading, body).items():
+                set_choice(section, value)
+            xbmc.sleep(250)                          # builtins are queued: let the strings land before they are read back
+            wizard_done()
+            return
+
+
+def wizard_done():
+    """setup wizard (skin 0.56.40): the fonts wait for Finish; tell the wizard their name and that they changed"""
+    home = xbmcgui.Window(10000)
+    home.setProperty('aeon.wiz.font', font_name())
+    home.setProperty('aeon.wiz.fontkey', fonts.preset_of(choices()))
+    home.setProperty('aeon.wiz.fontchanged', '1')
+
+
+def pick(wizard=False):
+    """Font combinations first (each with a mock-up in its two fonts); the last row opens the per-section list.
+    wizard: the setup wizard's row; Font.xml is written at its Finish, not now (a skin reload would close it)."""
     if xbmc.getSkinDir() != SKIN:
         return
     source = read()
@@ -178,12 +208,15 @@ def pick():
         for key, value in fonts.preset_choices(heading, body).items():
             set_choice(key, value)
         xbmc.sleep(250)                          # builtins are queued: let the strings land before they are read back
-        sync()
+        if wizard:
+            wizard_done()
+        else:
+            sync()
         return
-    sections(source)
+    sections(source, wizard)
 
 
-def sections(source):
+def sections(source, wizard=False):
     known = fonts.families(source)
     follow = text(31839, 'Follow the font set')
     dialog = xbmcgui.Dialog()
@@ -204,4 +237,7 @@ def sections(source):
             continue
         set_choice(key, options[got] if got else '')
         xbmc.sleep(150)                          # builtins are queued: let the string land before it is read back
-    sync()
+    if wizard:
+        wizard_done()
+    else:
+        sync()

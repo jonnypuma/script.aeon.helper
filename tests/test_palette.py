@@ -5,7 +5,7 @@ import types
 import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
-for name in ('xbmc', 'xbmcgui', 'xbmcvfs'):
+for name in ('xbmc', 'xbmcaddon', 'xbmcgui', 'xbmcvfs'):
     sys.modules.setdefault(name, types.ModuleType(name))
 import palette
 

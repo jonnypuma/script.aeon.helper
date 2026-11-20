@@ -187,3 +187,23 @@ msgstr "Uygulamanın ağınızdaki adresi, örneğin http://192.168.0.5:7878"
 msgctxt "#32047"
 msgid "Settings > General > Security in the app. It is sent only to this address."
 msgstr "Uygulamada Ayarlar > Genel > Güvenlik. Yalnızca bu adrese gönderilir."
+
+msgctxt "#32048"
+msgid "Series premiere"
+msgstr "Dizi prömiyeri"
+
+msgctxt "#32049"
+msgid "Season premiere"
+msgstr "Sezon prömiyeri"
+
+msgctxt "#32050"
+msgid "Mid-season finale"
+msgstr "Sezon ortası finali"
+
+msgctxt "#32051"
+msgid "Season finale"
+msgstr "Sezon finali"
+
+msgctxt "#32052"
+msgid "Series finale"
+msgstr "Dizi finali"

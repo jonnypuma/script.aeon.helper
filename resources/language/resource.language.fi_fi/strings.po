@@ -187,3 +187,23 @@ msgstr "Sovelluksen osoite verkossasi, esimerkiksi http://192.168.0.5:7878"
 msgctxt "#32047"
 msgid "Settings > General > Security in the app. It is sent only to this address."
 msgstr "Asetukset > Yleiset > Tietoturva sovelluksessa. Se lähetetään vain tähän osoitteeseen."
+
+msgctxt "#32048"
+msgid "Series premiere"
+msgstr "Sarjan ensi-ilta"
+
+msgctxt "#32049"
+msgid "Season premiere"
+msgstr "Kauden ensi-ilta"
+
+msgctxt "#32050"
+msgid "Mid-season finale"
+msgstr "Kauden välifinaali"
+
+msgctxt "#32051"
+msgid "Season finale"
+msgstr "Kauden finaali"
+
+msgctxt "#32052"
+msgid "Series finale"
+msgstr "Sarjan finaali"

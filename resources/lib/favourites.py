@@ -4,7 +4,7 @@ opens it. Works on the dicts of JSON-RPC Favourites.GetFavourites (type, title, 
 thumbnail). No Kodi imports."""
 import re
 
-KINDS = ('all', 'video', 'music', 'addons')
+KINDS = ('all', 'video', 'music', 'addons', 'channels')
 
 VIDEO_EXT = ('.mkv', '.mp4', '.m4v', '.avi', '.mov', '.wmv', '.ts', '.m2ts', '.mpg', '.mpeg', '.iso', '.strm', '.webm', '.vob')
 AUDIO_EXT = ('.mp3', '.flac', '.m4a', '.aac', '.ogg', '.opus', '.wav', '.wma', '.ape', '.alac', '.dsf', '.cue')
@@ -65,10 +65,20 @@ def classify(fav):
     return 'other', 'window', 0
 
 
-def wanted(favs, kind):
-    """(index, favourite) pairs in the group asked for ('all' or unknown: every one), in Kodi's order."""
+def wanted(favs, kind, channels=True):
+    """(index, favourite) pairs in the group asked for ('all' or unknown: every one), in Kodi's order. 'channels' (0.3.73,
+    Fused Glass): TV / radio channels only; channels=False leaves them out of 'video' and 'music' (Fused Glass has a
+    Channels group of its own)."""
     kind = kind if kind in KINDS else 'all'
-    return [(i, f) for i, f in enumerate(favs or ()) if kind == 'all' or classify(f)[0] == kind]
+
+    def keep(fav):
+        group, what, _dbid = classify(fav)
+        if kind == 'all':
+            return True
+        if kind == 'channels':
+            return what == 'channel'
+        return group == kind and (channels or what != 'channel')
+    return [(i, f) for i, f in enumerate(favs or ()) if keep(f)]
 
 
 def builtin(fav):

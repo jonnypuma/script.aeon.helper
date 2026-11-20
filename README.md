@@ -30,6 +30,9 @@ another skin its service does nothing.
 - **Caches:** library titles and artist genres, kept for the online lists and the Similar artists row.
 - **Memory hand-back on Linux / CoreELEC:** gives the memory Kodi has freed back to the system (`malloc_trim`), as
   chosen in Skin settings.
+- **Smooth song progress:** while the Fused Glass Now playing screen is open and the skin setting is on, sets the
+  card's progress as a fraction from the player's time, as often as Kodi draws the screen or at the rate chosen in
+  Skin settings (`smoothprog.py`).
 - **System panels:** uptime as `8d 15h 2m`.
 - **Setting migration:** carries the old `daylight.*` skin settings over to `aeon.*` once.
 

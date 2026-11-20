@@ -16,6 +16,7 @@ import shutil
 import time
 
 import xbmc
+import xbmcaddon
 import xbmcgui
 import xbmcvfs
 
@@ -24,6 +25,7 @@ from resources.lib import arr, planner
 
 DETAILS = 'plugin://plugin.video.themoviedb.helper/?info=details&tmdb_type=tv&tmdb_id=%s'
 FILMS = 'plugin://plugin.video.themoviedb.helper/?info=upcoming&tmdb_type=movie&page=%d'
+EPISODE = DETAILS + '&season=%d&episode=%d'   # 0.3.97: its episode_type (finale / mid_season ...)
 FILM_PAGES = 2
 STEP = 0.5                            # seconds between two shows
 ART = ('thumb', 'still', 'landscape', 'fanart', 'poster', 'clearlogo', 'tvshow.poster', 'tvshow.fanart', 'tvshow.clearlogo', 'tvshow.landscape')
@@ -105,6 +107,75 @@ def upcoming(today=None, days=None, what=''):
     found = [entry for entry in kept(what) if first.isoformat() <= (entry.get('premiered') or '') <= last]
     return sorted(found, key=lambda entry: (entry['premiered'], entry.get('showtitle') or entry.get('title') or ''))
 
+def publish_next(state):
+    """0.3.94 (skin 0.56.13; the user, on the Aeon Episode list: "next episode airing info if available underneath it"):
+    while an episode or season list is open, Window(Home).Property(aeon.next.of) = its show, aeon.next.code = "S3 E5",
+    aeon.next.day = "Wed 18 Nov" for the show's soonest episode in the Planner's list (from today on), else empty.
+    The file is read only when the show changes."""
+    home = xbmcgui.Window(10000)
+    show = ''
+    if xbmc.getCondVisibility('Window.IsActive(videos) + [Container.Content(episodes) | Container.Content(seasons)]'):
+        show = xbmc.getInfoLabel('ListItem.TVShowTitle') or xbmc.getInfoLabel('Container.ShowTitle')
+    if show == state.get('nextof'):
+        return
+    state['nextof'] = show
+    code = day = kind = ''
+    if show:
+        try:
+            for entry in upcoming(what='episodes'):
+                if entry.get('showtitle') != show:
+                    continue
+                date = datetime.date.fromisoformat(entry['premiered'][:10])
+                code = 'S%s E%s' % (entry.get('season', ''), entry.get('episode', ''))
+                day = '%s %d %s' % (xbmc.getLocalizedString(41 + date.weekday()), date.day, xbmc.getLocalizedString(50 + date.month))
+                word = planner.EPKIND_WORDS.get(entry.get('epkind') or '')
+                kind = xbmcaddon.Addon('script.aeon.helper').getLocalizedString(word) if word else ''
+                break
+        except Exception as error:                       # a damaged entry: no line rather than a stopped service
+            xbmc.log('[script.aeon.helper] next episode: %s' % error, xbmc.LOGINFO)
+            code = day = kind = ''
+    home.setProperty('aeon.next.of', show if code else '')
+    home.setProperty('aeon.next.kind', kind)
+    home.setProperty('aeon.next.code', code)
+    home.setProperty('aeon.next.day', day)
+
+
+
+def publish_season_pct(state):
+    """0.3.95 (skin 0.56.15; the user, on the Aeon Compact list: "circle season progress?"): while an episode list is
+    open, Window(Home).Property(aeon.cont.pct) = the share of its episodes watched (Kodi's Container.TotalWatched and
+    TotalUnWatched; the skin cannot divide) and aeon.cont.path = that list's folder, so the skin shows it only there."""
+    home = xbmcgui.Window(10000)
+    path = pct = ''
+    if xbmc.getCondVisibility('Window.IsActive(videos) + Container.Content(episodes)'):
+        path = xbmc.getInfoLabel('Container.FolderPath')
+        try:
+            watched = int(xbmc.getInfoLabel('Container.TotalWatched') or 0)
+            unwatched = int(xbmc.getInfoLabel('Container.TotalUnWatched') or 0)
+            if watched + unwatched:
+                pct = str(int(round(100.0 * watched / (watched + unwatched))))
+        except ValueError:
+            pct = ''
+    if state.get('contpct') == (path, pct):
+        return
+    state['contpct'] = (path, pct)
+    home.setProperty('aeon.cont.pct', pct)
+    home.setProperty('aeon.cont.path', path if pct else '')
+
+def next_type(tmdb, found):
+    """TMDb's type of the next episode (series_premiere ... season_finale), from TMDb Helper's details of that episode;
+    the first episode of a season needs no question (it is a premiere)"""
+    if int(found.get('episode') or 0) == 1 or not found.get('season'):
+        return ''
+    try:
+        files = rpc('Files.GetDirectory', {'directory': EPISODE % (tmdb, int(found['season']), int(found['episode'])), 'media': 'video',
+                                           'properties': ['customproperties']}).get('files') or []
+        return ((files[0].get('customproperties') or {}).get('episode_type') or '') if files else ''
+    except Exception as error:               # no type is only no tag
+        xbmc.log('[script.aeon.helper] Planner: episode type: %s' % error, xbmc.LOGDEBUG)
+        return ''
+
+
 def build(monitor=None, step=STEP):
     """Read the list again (the service when it is due, or the Planner's Update now). Never during playback: nothing
     starts while something plays, and a read stops (keeping the old list) as soon as something starts."""
@@ -115,6 +186,7 @@ def build(monitor=None, step=STEP):
     shows = rpc('VideoLibrary.GetTVShows', {'properties': ['title', 'plot', 'status', 'uniqueid']}).get('tvshows') or []
     # an episode nobody has described yet falls back to the plot of its show, which is in the library
     plots = dict((show.get('title') or '', show.get('plot') or '') for show in shows)
+    statuses = dict((show.get('title') or '', show.get('status') or '') for show in shows)
     asked = 0
     candidates = planner.airing_candidates(shows)
     xbmc.log('[script.aeon.helper] Planner: reading the next episodes of %d shows' % len(candidates), xbmc.LOGINFO)
@@ -130,6 +202,8 @@ def build(monitor=None, step=STEP):
                 more = planner.details(entry, custom)
                 more['showplot'] = plots.get(title, '')
                 found['more'] = more
+                found['epkind'] = planner.episode_kind(found['season'], found['episode'], next_type(tmdb, found),
+                                                       custom.get('status') or statuses.get(title, ''))
                 episodes.append(found)
         if monitor is not None and (monitor.waitForAbort(step) or xbmc.Player().isPlaying()):
             xbmc.log('[script.aeon.helper] Planner: stopped after %d shows, Kodi stops or something plays (the old list is kept)'

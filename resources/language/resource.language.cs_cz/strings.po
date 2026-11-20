@@ -187,3 +187,23 @@ msgstr "Adresa aplikace ve vaší síti, například http://192.168.0.5:7878"
 msgctxt "#32047"
 msgid "Settings > General > Security in the app. It is sent only to this address."
 msgstr "Nastavení > Obecné > Zabezpečení v aplikaci. Posílá se jen na tuto adresu."
+
+msgctxt "#32048"
+msgid "Series premiere"
+msgstr "Premiéra seriálu"
+
+msgctxt "#32049"
+msgid "Season premiere"
+msgstr "Premiéra řady"
+
+msgctxt "#32050"
+msgid "Mid-season finale"
+msgstr "Finále poloviny řady"
+
+msgctxt "#32051"
+msgid "Season finale"
+msgstr "Finále řady"
+
+msgctxt "#32052"
+msgid "Series finale"
+msgstr "Finále seriálu"

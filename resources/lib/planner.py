@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """Calendar logic of the Planner (upcoming episodes and films). No Kodi imports.
 
-The Planner never shows a day before today. A week runs from the chosen first weekday (0 = Monday .. 6 = Sunday);
+The Planner never shows a day before today (Earlier days on: before the first day of this week). A week runs from the chosen first weekday (0 = Monday .. 6 = Sunday);
 week 0 is the week that contains today."""
 import datetime
+import re
 
 
 def parse(text):
@@ -50,20 +51,22 @@ def last_day(days, today):
     return max(days) if days else today
 
 
-def step_day(today, current, step, days):
-    """Day view: the next / previous day, never before today, never past the last planned day."""
+def step_day(today, current, step, days, earliest=None):
+    """Day view: the next / previous day, never before today (or `earliest`: Earlier days on, 0.3.76), never past the
+    last planned day."""
+    first = earliest or today
     target = current + datetime.timedelta(days=step)
-    if target < today:
-        return today
+    if target < first:
+        return first
     if target > last_day(days, today):
         return current
     return target
 
 
-def step_column(today, current, step, days):
+def step_column(today, current, step, days, earliest=None):
     """Week view: the next / previous day that has something on it (so the focus always lands on a list).
-    Returns the same day when there is none in that direction."""
-    planned = sorted(date for date in days if date >= today)
+    Returns the same day when there is none in that direction. earliest: the first day allowed (default today)."""
+    planned = sorted(date for date in days if date >= (earliest or today))
     if step > 0:
         later = [date for date in planned if date > current]
         return later[0] if later else current
@@ -193,6 +196,46 @@ def next_episode(showtitle, entry, custom, today):
             'runtime': runtime, 'art': art}
 
 
+# ------------------------------------------------------------------ premieres and finales (0.3.97)
+# The user (2026-11-17): "show if next airing episode is a series finale, a season finale, a series premiere, a season
+# premiere ... in the planner as well". TMDb marks an episode's type; TMDb Helper's details of an episode carry it as
+# episode_type (series_premiere, season_premiere, mid_season_finale, season_finale, standard, special).
+EPKIND_WORDS = {'series_premiere': 32048, 'season_premiere': 32049, 'mid_season_finale': 32050, 'season_finale': 32051,
+                'series_finale': 32052}
+ENDED = ('ended', 'canceled', 'cancelled')
+
+
+def episode_kind(season, episode, episode_type='', show_status=''):
+    """series_premiere / season_premiere / mid_season_finale / season_finale / series_finale, or '' (a standard episode
+    or a special). The first episode of a season is a premiere whatever TMDb says; a finale of a show that has ended is
+    the series finale."""
+    try:
+        season, episode = int(season or 0), int(episode or 0)
+    except (TypeError, ValueError):
+        return ''
+    if season < 1 or episode < 1:
+        return ''
+    if episode == 1:
+        return 'series_premiere' if season == 1 else 'season_premiere'
+    kind = (episode_type or '').strip().lower().replace('-', '_').replace(' ', '_')
+    if kind in ('series_finale',):
+        return 'series_finale'
+    if kind in ('finale', 'season_finale'):
+        return 'series_finale' if (show_status or '').strip().lower() in ENDED else 'season_finale'
+    if kind in ('mid_season', 'mid_season_finale'):
+        return 'mid_season_finale'
+    return ''
+
+
+def entry_kind(entry):
+    """The kind of a kept Planner entry: what the list build stored (0.3.97+), else, for a list kept from before
+    (no 'epkind' key), the premieres the season and episode numbers give. Films and albums have none."""
+    kind = entry.get('epkind')
+    if kind is None and (entry.get('kind') or 'episode') == 'episode':
+        kind = episode_kind(entry.get('season'), entry.get('episode'))
+    return kind or ''
+
+
 # ------------------------------------------------------------------ the kept Next Aired list
 # Skin.String(aeon.planner.refresh): how often the list is read again. '' = every two weeks (the default).
 REFRESH = ('daily', 'weekly', '', 'monthly')
@@ -274,3 +317,99 @@ def week_kinds(entries, today, n=7):
         eps, films, albums = counts.get(date, (0, 0, 0))
         out.append((date, eps, films, albums))
     return out
+
+
+# 0.3.69 placeholder texts from release calendars ("None" showed as the plot of an episode on the Planner spotlight)
+PLACEHOLDERS = ('none', 'null', 'n/a', 'na', 'tba', 'tbd', '-', '...')
+GENERIC_TITLE = re.compile(r'^(episode|ep\.?|aflevering|folge|épisode|episodio|episódio|avsnitt|jakso|odcinek|epizoda|'
+                           r'epizód|bölüm|эпизод|серия)?\s*#?\s*\d+$', re.IGNORECASE)
+
+
+def text_or_empty(value):
+    """The text, or '' for a missing value or a placeholder ("None", "TBA", "N/A" ...)."""
+    if value is None:
+        return ''
+    text = value.strip() if isinstance(value, str) else str(value).strip()
+    return '' if text.lower() in PLACEHOLDERS else text
+
+
+def real_episode_title(title):
+    """The episode's title when it says something; '' for "Episode 2", "Folge 2", "#2", "TBA": the spotlights spell
+    out Season / Episode themselves, so a generic title would only repeat it."""
+    text = text_or_empty(title)
+    return '' if GENERIC_TITLE.match(text) else text
+
+
+def only_watched(entries, titles):
+    """Fused Glass Planner > Shows you watch (0.3.74): the episodes of the shows in `titles` (shows with a watched
+    episode in the library), films and albums untouched."""
+    keep = set((title or '').strip().lower() for title in titles)
+    return [entry for entry in entries or ()
+            if (entry.get('kind') or 'episode') != 'episode' or (entry.get('showtitle') or '').strip().lower() in keep]
+
+
+def behind(on, entry):
+    """True when the episode to continue, (season, episode), comes before this airing episode: the Planner then says
+    "You're on S3 E1" on it."""
+    if not on or (entry.get('kind') or 'episode') != 'episode':
+        return False
+    return (int(on[0] or 0), int(on[1] or 0)) < (int(entry.get('season') or 0), int(entry.get('episode') or 0))
+
+
+def week_summary(kinds, one_ep, many_ep, one_film, many_film):
+    """{'episode': 21, 'movie': 1} -> '21 episodes, 1 film' with the given patterns ({n}); '' when nothing is on."""
+    parts = []
+    for count, one, many in ((kinds.get('episode', 0), one_ep, many_ep), (kinds.get('movie', 0), one_film, many_film)):
+        if count:
+            parts.append(one if count == 1 else many.replace('{n}', str(count)))
+    return ', '.join(parts)
+
+
+def aired_entries(episodes):
+    """Library episodes (JSON-RPC: title, showtitle, season, episode, firstaired, plot, art) -> Planner entries for the
+    days before today (Earlier days, 0.3.76)."""
+    out = []
+    for ep in episodes or ():
+        if not ep.get('firstaired'):
+            continue
+        out.append({'kind': 'episode', 'showtitle': ep.get('showtitle') or '', 'title': ep.get('title') or '',
+                    'season': ep.get('season') or 0, 'episode': ep.get('episode') or 0, 'premiered': ep['firstaired'][:10],
+                    'plot': ep.get('plot') or '', 'art': dict(ep.get('art') or {}), 'more': {}, 'aired': True})
+    return out
+
+
+def earlier_mix(kept, aired, today):
+    """Earlier days on (0.3.78): the kept list from today on, plus the library's episodes that aired before today.
+    The kept list still holds what was to come when it was read, but the lists of the days before today show only the
+    library's episodes, so its older entries are left out: the Planner never counts or steps onto a day for titles
+    its list does not show (that left the focus on an empty list). Entries without a date stay with the kept part
+    (group() drops them)."""
+    out = [entry for entry in kept or () if (parse(entry.get('premiered')) or today) >= today]
+    for entry in aired or ():
+        date = parse(entry.get('premiered'))
+        if date is not None and date < today:
+            out.append(entry)
+    return out
+
+
+def aired_cache_key(first, today, episodes):
+    """The key the cached Earlier days list is kept under (0.3.78): the week's first day, today, and the library's
+    episode count (aeon.count.episodes, new after every scan or clean)."""
+    return '%s|%s|%s' % (first.isoformat(), today.isoformat(), episodes or '')
+
+
+def aired_cached(raw, key, now, ttl=600):
+    """The entries of a cached Earlier days list (JSON text) when it is for this key and younger than ttl seconds,
+    else None."""
+    import json
+    try:
+        data = json.loads(raw or '{}')
+    except ValueError:
+        return None
+    if not isinstance(data, dict) or data.get('key') != key or not isinstance(data.get('entries'), list):
+        return None
+    try:
+        age = now - float(data.get('time') or 0)
+    except (TypeError, ValueError):
+        return None
+    return data['entries'] if 0 <= age < ttl else None

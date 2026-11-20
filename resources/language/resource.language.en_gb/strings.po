@@ -187,3 +187,23 @@ msgstr ""
 msgctxt "#32047"
 msgid "Settings > General > Security in the app. It is sent only to this address."
 msgstr ""
+
+msgctxt "#32048"
+msgid "Series premiere"
+msgstr ""
+
+msgctxt "#32049"
+msgid "Season premiere"
+msgstr ""
+
+msgctxt "#32050"
+msgid "Mid-season finale"
+msgstr ""
+
+msgctxt "#32051"
+msgid "Season finale"
+msgstr ""
+
+msgctxt "#32052"
+msgid "Series finale"
+msgstr ""

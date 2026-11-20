@@ -16,7 +16,10 @@ def art_keys(dbtype):
 
 
 # Home spotlights: the menu item in focus (Container(9000).ListItem.Label2) -> the list that shows its spotlight
-SPOT_LISTS = {'movies': 9421, 'tv': 9422, 'music': 9423, 'custom1': 9411, 'custom2': 9412, 'custom3': 9413, 'planner': 9414}
+SPOT_LISTS = {'movies': 9421, 'tv': 9422, 'music': 9423, 'custom1': 9411, 'custom2': 9412, 'custom3': 9413, 'planner': 9414,
+              # custom items 4-10 (0.3.86)
+              'custom4': 9415, 'custom5': 9416, 'custom6': 9417, 'custom7': 9418, 'custom8': 9419, 'custom9': 9420,
+              'custom10': 9424}
 
 
 def spot_list(menu_key):

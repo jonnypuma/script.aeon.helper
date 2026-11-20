@@ -10,9 +10,46 @@ RADIUS = 14             # Gaussian blur radius at that size (about 42 px on scre
 QUALITY = 82
 
 
-def cache_name(source):
-    """File name of the blurred copy of a picture path."""
-    return hashlib.md5(source.encode('utf-8')).hexdigest() + '.jpg'
+# 0.3.104 (skin 0.56.28) Expert settings: Panel blur (aeon.x.pblur) and Fanart blur (aeon.x.fblur) pick the radius
+PANEL_RADIUS = {'off': None, 'light': 8, 'strong': 22}           # '' (Default): RADIUS
+# 0.3.111 (skin 0.56.45) Library fanart blur: Off, -2 .. +2 ('' and z = 0, the old Light, the default since then);
+# light / medium / strong are the old steps (moved to '' / p1 / p2 by migrate_fanblur)
+FANART_RADIUS = {'off': None, 'm2': 1, 'm1': 2, '': 4, 'z': 4, 'p1': 9, 'p2': 16, 'light': 4, 'medium': 9, 'strong': 16}
+FANBLUR_OLD = {'light': '', 'medium': 'p1', 'strong': 'p2'}
+# 0.3.110 (skin 0.56.44) Aeon Glass's Panel blur (aeon.agblur): the menus' backdrop blurred, '' (Off): none
+AG_RADIUS = {'light': 6, 'medium': RADIUS, 'strong': 24}
+
+
+def panel_radius(step):
+    """the panels' blur radius for a Panel blur step ('' / unknown: the default; 'off': None)"""
+    return PANEL_RADIUS[step] if step in PANEL_RADIUS else RADIUS
+
+
+def fanart_radius(step):
+    """the library fanart's blur radius for a step (unknown: the default 0)"""
+    return FANART_RADIUS.get(step, FANART_RADIUS[''])
+
+
+def fanblur_new(value, view=False):
+    """an old Library fanart blur value as a new one (None: nothing to change); a view's 0 is z ('' follows)"""
+    if value not in FANBLUR_OLD:
+        return None
+    new = FANBLUR_OLD[value]
+    return 'z' if view and not new else new
+
+
+def menu_radius(fglass_frost, ag_step):
+    """the radius of the menus' blurred backdrop: Fused Glass's Frost style the default, Aeon Glass its Panel blur step
+    ('' / unknown: None, no blurred copy)"""
+    if fglass_frost:
+        return RADIUS
+    return AG_RADIUS.get(ag_step)
+
+
+def cache_name(source, radius=RADIUS):
+    """File name of the blurred copy of a picture path (the default radius keeps the old names)."""
+    name = hashlib.md5(source.encode('utf-8')).hexdigest()
+    return name + ('.jpg' if radius == RADIUS else '_r%d.jpg' % radius)
 
 
 def cover_box(size, target=SIZE):
@@ -30,7 +67,7 @@ def cover_box(size, target=SIZE):
     return 0, top, w, top + nh
 
 
-def make(data):
+def make(data, radius=RADIUS):
     """JPEG bytes of the blurred, downscaled backdrop (b'' when the picture cannot be read)."""
     try:
         from PIL import Image, ImageFilter
@@ -43,7 +80,7 @@ def make(data):
     if not box:
         return b''
     image = image.crop(box).resize(SIZE, Image.BILINEAR)
-    image = image.filter(ImageFilter.GaussianBlur(RADIUS))
+    image = image.filter(ImageFilter.GaussianBlur(radius))
     out = io.BytesIO()
     image.save(out, 'JPEG', quality=QUALITY)
     return out.getvalue()

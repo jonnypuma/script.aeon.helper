@@ -1,0 +1,20 @@
+# Aeon Fuse Helper
+
+# Text files are stored and checked out with LF line endings
+* text=auto eol=lf
+
+# Binary files: no line-ending changes, no text diffs
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.zip binary
+
+# Hunk headers in diffs
+*.py diff=python
+*.md diff=markdown
+
+# Left out of `git archive` (the add-on zip): the tests run outside Kodi
+.gitignore export-ignore
+.gitattributes export-ignore
+/tests/** export-ignore

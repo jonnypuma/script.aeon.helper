@@ -176,6 +176,20 @@ class Fonts(unittest.TestCase):
         self.assertEqual(fonts.section_name('lyr1', 'player'), 'lyr1')
         self.assertEqual(fonts.section_name('$PARAM[font]', 'home'), '$PARAM[font]')
 
+    def test_capitals_twins_follow_the_settings_face(self):
+        out = fonts.build(BASE, {})
+        ET.fromstring(out.encode('utf-8'))
+        self.assertIn('<font><name>uc_st_ui_24</name><filename>Fig.ttf</filename><size>24</size>'
+                      '<style>uppercase</style></font>', out)
+        self.assertEqual(named(out, 'Arial')['uc_st_ui_24'], 'arial.ttf')
+        self.assertEqual(named(fonts.build(BASE, {'settings': 'Arial'}), 'Default')['uc_st_ui_24'], 'arial.ttf')
+        # rebuilt, not doubled
+        self.assertEqual(fonts.build(out, {}).count('<name>uc_st_ui_24</name>'), 2)
+
+    def test_uppercase_keeps_own_style(self):
+        self.assertEqual(fonts.uppercase('<size>24</size><style>bold</style>'), '<size>24</size><style>bold uppercase</style>')
+        self.assertEqual(fonts.uppercase('<size>24</size>'), '<size>24</size><style>uppercase</style>')
+
 
 if __name__ == '__main__':
     unittest.main()

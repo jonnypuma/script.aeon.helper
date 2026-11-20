@@ -187,3 +187,23 @@ msgstr "Az alkalmazás címe a hálózaton, például http://192.168.0.5:7878"
 msgctxt "#32047"
 msgid "Settings > General > Security in the app. It is sent only to this address."
 msgstr "Beállítások > Általános > Biztonság az alkalmazásban. Csak erre a címre kerül elküldésre."
+
+msgctxt "#32048"
+msgid "Series premiere"
+msgstr "Sorozatpremier"
+
+msgctxt "#32049"
+msgid "Season premiere"
+msgstr "Évadpremier"
+
+msgctxt "#32050"
+msgid "Mid-season finale"
+msgstr "Évadközi finálé"
+
+msgctxt "#32051"
+msgid "Season finale"
+msgstr "Évadzáró"
+
+msgctxt "#32052"
+msgid "Series finale"
+msgstr "Sorozatzáró"

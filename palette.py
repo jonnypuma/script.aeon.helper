@@ -2,15 +2,19 @@
 """RunScript(script.aeon.helper,palette): choose the palette of the Aeon Fuse skin.
 
 A palette is a Kodi colour theme: one file in the skin's colors folder (defaults.xml = the "Aeon" palette). Choosing one
-sets Kodi's own setting (Settings > Interface > Skin > Colours shows the same list) and Kodi reloads the colours."""
+sets Kodi's own setting (Settings > Interface > Skin > Colours shows the same list) and Kodi reloads the colours.
+A palette other than Aeon can colour the menus and the library views, the menus only or the library views only (skin
+0.40.4): a colour file per choice ("Nord", "Nord (menus)", "Nord (library)"), see resources/lib/palscope.py.
+RunScript(script.aeon.helper,palscope) asks only where the palette in use applies."""
 import json
 import os
 
 import xbmc
+import xbmcaddon
 import xbmcgui
 import xbmcvfs
 
-from resources.lib import palettestyle
+from resources.lib import palettestyle, palscope
 
 SKIN = 'skin.aeon.fuse'
 DEFAULT = 'SKINDEFAULT'
@@ -24,7 +28,7 @@ def rpc(method, params):
 def names():
     folder = xbmcvfs.translatePath('special://home/addons/%s/colors/' % SKIN)
     found = sorted(os.path.splitext(name)[0] for name in os.listdir(folder) if name.lower().endswith('.xml') and name.lower() not in ('defaults.xml', 'fused glass.xml'))
-    return found
+    return [name for name in found if not palscope.is_variant(name)]
 
 
 def read_colours(name):
@@ -38,8 +42,57 @@ def read_colours(name):
 
 
 def current():
+    """(palette, scope) in use"""
     value = rpc('Settings.GetSettingValue', {'setting': 'lookandfeel.skincolors'}).get('result', {}).get('value', DEFAULT)
-    return os.path.splitext(value)[0]
+    return palscope.split(value)
+
+
+def skin_text(ident, fallback):
+    try:
+        text = xbmcaddon.Addon(SKIN).getLocalizedString(ident)
+    except RuntimeError:
+        text = ''
+    return text or fallback
+
+
+def ask_scope(name, scope):
+    """Where palette `name` applies: '', 'menus', 'library', or None when cancelled."""
+    labels = [skin_text(32467, 'Menus and library views'), skin_text(32468, 'Menus only'), skin_text(32469, 'Library views only')]
+    got = xbmcgui.Dialog().select('%s: %s' % (skin_text(32466, 'Use the palette for'), name), labels,
+                                  preselect=palscope.SCOPES.index(scope) if scope in palscope.SCOPES else 0)
+    return None if got < 0 else palscope.SCOPES[got]
+
+
+def apply(name, scope):
+    """Use palette `name` for `scope`: Kodi's colour setting, and the skin strings the service and the labels read."""
+    value = palscope.file_for(name, scope)
+    # Kodi shows new colours only by loading the skin again, and it skips that load while a dialog is open: from
+    # View settings (dialog 1166) the palette was saved but never shown. Close the dialog first.
+    if xbmc.getCondVisibility('Window.IsVisible(1166)'):
+        xbmc.executebuiltin('Dialog.Close(1166,true)')
+        monitor = xbmc.Monitor()
+        for _ in range(40):
+            if not xbmc.getCondVisibility('Window.IsVisible(1166) | System.HasModalDialog') or monitor.waitForAbort(0.05):
+                break
+    # Kodi drops the palette when the theme changes: the service puts this one back when the Aeon theme returns
+    xbmc.executebuiltin('Skin.SetString(aeon.palette,%s)' % value)
+    xbmc.executebuiltin('Skin.SetString(aeon.palbase,%s)' % name)
+    reply = rpc('Settings.SetSettingValue', {'setting': 'lookandfeel.skincolors', 'value': value})
+    if not reply.get('result'):
+        rpc('Settings.SetSettingValue', {'setting': 'lookandfeel.skincolors', 'value': value + '.xml'})
+
+
+def scope_only():
+    """RunScript(script.aeon.helper,palscope): change only where the palette in use applies."""
+    if xbmc.getSkinDir() != SKIN:
+        return
+    name, scope = current()
+    if name == DEFAULT:
+        return
+    got = ask_scope(name, scope)
+    if got is None or got == scope:
+        return
+    apply(name, got)
 
 
 def pick():
@@ -48,7 +101,7 @@ def pick():
     found = names()
     values = [DEFAULT] + found
     labels = ['Aeon'] + found
-    now = current()
+    now, now_scope = current()
     at = values.index(now) if now in values else 0
     # each row in its own palette's colours (DialogSelect draws them while Window(Home).Property(aeon.palpick) is set)
     items = []
@@ -66,23 +119,18 @@ def pick():
         got = xbmcgui.Dialog().select(xbmc.getInfoLabel('$LOCALIZE[31050]') or 'Palette', items, preselect=at)
     finally:
         home.clearProperty('aeon.palpick')
-    if got < 0 or values[got] == now:
+    if got < 0:
         return
-    # the backdrop question first, while View settings is still open (it tells which view is meant)
-    neutral()
-    # Kodi shows new colours only by loading the skin again, and it skips that load while a dialog is open: from
-    # View settings (dialog 1166) the palette was saved but never shown. Close the dialog first.
-    if xbmc.getCondVisibility('Window.IsVisible(1166)'):
-        xbmc.executebuiltin('Dialog.Close(1166,true)')
-        monitor = xbmc.Monitor()
-        for _ in range(40):
-            if not xbmc.getCondVisibility('Window.IsVisible(1166) | System.HasModalDialog') or monitor.waitForAbort(0.05):
-                break
-    # Kodi drops the palette when the theme changes: the service puts this one back when the Aeon theme returns
-    xbmc.executebuiltin('Skin.SetString(aeon.palette,%s)' % values[got])
-    reply = rpc('Settings.SetSettingValue', {'setting': 'lookandfeel.skincolors', 'value': values[got]})
-    if not reply.get('result'):
-        rpc('Settings.SetSettingValue', {'setting': 'lookandfeel.skincolors', 'value': values[got] + '.xml'})
+    name = values[got]
+    # a palette other than Aeon: for the menus and the library views, the menus only or the library views only
+    scope = '' if name == DEFAULT else ask_scope(labels[got], now_scope if name == now else '')
+    if scope is None or (name == now and scope == now_scope):
+        return
+    # the backdrop question first, while View settings is still open (it tells which view is meant); not when the
+    # library keeps the Aeon colours
+    if scope != 'menus':
+        neutral()
+    apply(name, scope)
 
 
 def effective_backdrop(global_bg, view_bg, from_view_settings):

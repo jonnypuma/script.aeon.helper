@@ -101,7 +101,10 @@ def folder_names(folder, listings):
 
 
 def check_art(kind, ident, art, label, sizes, listings):
-    """Checks the item's art; fixes what it can. Returns ([(label, art type, new path)], [(label, art type)])."""
+    """Checks the item's art; fixes what it can. Returns ([(label, art type, new path, source)], [(label, art type)]);
+    source is 'folder' (a picture of the same name in the same folder took its place) or 'cleared' (a season's slot
+    was emptied: nothing in the folder fits, and the skin shows the show's own picture for an empty season slot; a
+    media manager fills an empty slot later, while a filled one looks done to it)."""
     fixed, wrong = [], []
     for art_type, url in sorted(art.items()):
         if '.' in art_type or not artshape.checked(art_type):
@@ -122,7 +125,11 @@ def check_art(kind, ident, art, label, sizes, listings):
         if better:
             rpc(DETAILS[kind][3], {DETAILS[kind][1]: ident, 'art': {art_type: better}})
             log('%s %s: %s (%dx%d) -> %s' % (label, art_type, path, size[0], size[1], better))
-            fixed.append((label, art_type, better))
+            fixed.append((label, art_type, better, 'folder'))
+        elif kind == 'season':
+            rpc(DETAILS[kind][3], {DETAILS[kind][1]: ident, 'art': {art_type: None}})
+            log("%s %s: %s (%dx%d) -> cleared (the skin shows the show's picture)" % (label, art_type, path, size[0], size[1]))
+            fixed.append((label, art_type, '', 'cleared'))
         else:
             wrong.append((label, art_type))
     return fixed, wrong
@@ -211,9 +218,9 @@ class Guard(object):
             if ident:
                 fixed += check_show(ident, sizes, listings)[0]
         if fixed:
-            names = sorted({label.split(' · ')[0] for label, _t, _p in fixed})
+            names = sorted({item[0].split(' · ')[0] for item in fixed})
             xbmcgui.Dialog().notification(text(32443, 'Library art') + ' · ' + ', '.join(names)[:60],
-                                          text(32447, 'Replaced with a picture that fits: %d') % len(fixed),
+                                          text(32447, 'Fixed in the library: %d') % len(fixed),
                                           xbmcgui.NOTIFICATION_INFO, 6000)
 
 
@@ -294,9 +301,17 @@ def check_all():
     log('library check: %d pictures known, %d folders with a picture of the wrong shape, %d fixed, %d still wrong'
         % (len(sizes), len(folders), len(fixed), len(wrong)))
     lines = []
-    if fixed:
-        lines.append('[B]%s: %d[/B]' % (text(32444, 'Replaced with a picture that fits from the same folder'), len(fixed)))
-        lines += ['%s · %s' % (label, art_name(art_type)) for label, art_type, _p in fixed]
+    for source, ident, fallback in (('folder', 32444, 'Now uses a picture from the same folder that fits'),
+                                    ('cleared', 32450, "Slot left empty: the skin shows the show's picture until season art is added")):
+        these = [(label, art_type) for label, art_type, _p, src in fixed if src == source]
+        if these:
+            if lines:
+                lines.append('')
+            lines.append('[B]%s: %d[/B]' % (text(ident, fallback), len(these)))
+            lines += ['%s · %s' % (label, art_name(art_type)) for label, art_type in these]
+    if lines:
+        # everything happens in Kodi's library: say so first (the files on disk are never touched)
+        lines = ['[COLOR a3ffffff]%s[/COLOR]' % text(32451, "Only Kodi's library changed. Your files are untouched."), ''] + lines
     if wrong:
         if lines:
             lines.append('')

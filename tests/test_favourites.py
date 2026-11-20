@@ -32,6 +32,12 @@ class TestFavourites(unittest.TestCase):
         self.assertEqual([i for i, _ in fv.wanted(favs, 'all')], [0, 1, 2, 3])
         self.assertEqual(len(fv.wanted(favs, 'nonsense')), 4)
 
+    def test_channels_group(self):
+        favs = [SHOW, CHANNEL, FILM]
+        self.assertEqual([i for i, _ in fv.wanted(favs, 'video')], [0, 1, 2])
+        self.assertEqual([i for i, _ in fv.wanted(favs, 'video', channels=False)], [0, 2])
+        self.assertEqual([i for i, _ in fv.wanted(favs, 'channels')], [1])
+
     def test_builtin(self):
         self.assertEqual(fv.builtin(SHOW), 'ActivateWindow(videos,"videodb://tvshows/titles/412/",return)')
         self.assertEqual(fv.builtin(FILM), 'PlayMedia("nfs://nas/Movies/3 Godfathers (1948).mkv")')

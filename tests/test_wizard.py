@@ -8,22 +8,76 @@ from resources.lib import wizard
 
 
 class TestWizard(unittest.TestCase):
+    NOW = {'theme': 'fused', 'menutheme': '', 'fgmenu': 'system', 'palette': 'Fused Glass.xml'}
+
     def test_nothing_to_do(self):
-        self.assertEqual(wizard.plan('aeon', False, 'SKINDEFAULT', 'SKINDEFAULT'), [])
-        self.assertEqual(wizard.plan('aeon', False, 'Nord', 'Nord.xml'), [])
-        self.assertEqual(wizard.plan('glass', True, 'Nord', 'SKINDEFAULT'), [])      # palettes do not count with Glass
-        self.assertEqual(wizard.plan('', False, '', 'Nord'), [])
+        self.assertEqual(wizard.plan(dict(self.NOW), self.NOW), [])
+        aeon = {'theme': 'aeon', 'menutheme': 'mosaic', 'fgmenu': '', 'palette': 'Nord.xml'}
+        self.assertEqual(wizard.plan({'theme': 'aeon', 'menutheme': 'mosaic', 'palette': 'Nord'}, aeon), [])
+        # Bridge is the empty string; Aeon Glass counts Fuse only
+        self.assertEqual(wizard.plan({'theme': 'aeon', 'menutheme': 'bridge', 'palette': 'Nord'}, dict(aeon, menutheme='')), [])
+        glass = {'theme': 'glass', 'menutheme': 'mosaic', 'fgmenu': '', 'palette': ''}
+        self.assertEqual(wizard.plan({'theme': 'glass', 'menutheme': '', 'palette': 'Nord'}, glass), [])
+
+    def test_style(self):
+        self.assertEqual(wizard.plan(dict(self.NOW, fgmenu='frost'), self.NOW), [('fgmenu', 'frost')])
+        self.assertEqual(wizard.plan(dict(self.NOW, fgmenu=''), self.NOW), [('fgmenu', '')])
+        aeon = {'theme': 'aeon', 'menutheme': '', 'fgmenu': '', 'palette': ''}
+        self.assertEqual(wizard.plan(dict(aeon, menutheme='fused'), aeon), [('menutheme', 'fused')])
+        glass = {'theme': 'glass', 'menutheme': 'fused', 'fgmenu': '', 'palette': ''}
+        self.assertEqual(wizard.plan(dict(glass, menutheme='mosaic'), glass), [('menutheme', '')])
 
     def test_palette(self):
-        self.assertEqual(wizard.plan('aeon', False, 'Nord', 'SKINDEFAULT'), [('palette', 'Nord')])
-        self.assertEqual(wizard.plan('aeon', False, 'SKINDEFAULT', 'Dracula.xml'), [('palette', 'SKINDEFAULT')])
-        self.assertEqual(wizard.plan('aeon', False, 'Nord', ''), [('palette', 'Nord')])
+        aeon = {'theme': 'aeon', 'menutheme': '', 'fgmenu': '', 'palette': 'SKINDEFAULT'}
+        self.assertEqual(wizard.plan(dict(aeon, palette='Nord'), aeon), [('palette', 'Nord')])
+        self.assertEqual(wizard.plan(dict(aeon, palette='SKINDEFAULT'), dict(aeon, palette='Dracula.xml')), [('palette', 'SKINDEFAULT')])
+        self.assertEqual(wizard.plan(dict(aeon, palette='Nord'), dict(aeon, palette='Nord (library).xml')), [])
+        # palettes do not count in the glass themes
+        self.assertEqual(wizard.plan(dict(self.NOW, palette='Nord'), self.NOW), [])
 
     def test_theme(self):
-        self.assertEqual(wizard.plan('glass', False, 'Nord', 'Nord'), [('vglass', True), ('theme', 'Glass')])
-        self.assertEqual(wizard.plan('aeon', True, 'SKINDEFAULT', 'SKINDEFAULT'), [('vglass', False), ('theme', 'Aeon')])
-        # back to Aeon with a new palette: the palette is remembered before the theme changes
-        self.assertEqual(wizard.plan('aeon', True, 'Nord', 'SKINDEFAULT'), [('vglass', False), ('palette', 'Nord'), ('theme', 'Aeon')])
+        self.assertEqual(wizard.plan(dict(self.NOW, theme='glass'), self.NOW), [('theme', 'glass')])
+        # to Aeon with a new palette and a menu style: style and palette are set before the theme changes
+        want = {'theme': 'aeon', 'menutheme': 'ledger', 'fgmenu': 'system', 'palette': 'Nord'}
+        self.assertEqual(wizard.plan(want, self.NOW), [('menutheme', 'ledger'), ('palette', 'Nord'), ('theme', 'aeon')])
+        self.assertEqual(wizard.KODI_THEME['fused'], 'Fused Glass')
+
+    def test_theme_key(self):
+        self.assertEqual(wizard.theme_key('Fused Glass'), 'fused')
+        self.assertEqual(wizard.theme_key('Glass'), 'glass')
+        self.assertEqual(wizard.theme_key('SKINDEFAULT'), 'aeon')
+        self.assertEqual(wizard.theme_key(''), 'aeon')
+
+    def test_defaults(self):
+        calls, later = wizard.defaults('fused')
+        self.assertEqual(later, {'fgmenu': 'system'})
+        self.assertIn('Skin.Reset(aeon.fgshadow)', calls)
+        self.assertIn('Skin.Reset(aeon.lowmenu)', calls)
+        calls, later = wizard.defaults('aeon')
+        self.assertEqual(later, {'menutheme': '', 'palette': 'SKINDEFAULT'})
+        self.assertEqual(wizard.defaults('glass')[1], {'menutheme': ''})
+        # every theme sets the same settings, so a change of theme never leaves one of them behind
+        self.assertEqual(sorted(wizard.defaults('aeon')[0]), sorted(wizard.defaults('glass')[0]))
+
+    def test_defaults_cover_the_wizard_rows(self):
+        # each skin setting a wizard row changes is in the defaults table (skin.aeon.fuse beside the helper)
+        import re
+        skin = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'skin.aeon.fuse', '1080i', 'Custom_1173_SetupWizard.xml')
+        if not os.path.isfile(skin):
+            self.skipTest('skin not beside the helper')
+        text = open(skin, encoding='utf-8').read()
+        used = set(re.findall(r'Skin\.(?:SetString|Reset|ToggleSetting|SetBool)\((aeon\.[\w.]+)', text))
+        used -= {'aeon.wizard.done'}
+        used = set(u for u in used if not u.startswith('aeon.wiz.add.'))   # add-on ticks (addonrec batch), not settings
+        missing = sorted(used - set(wizard.COMMON))
+        self.assertEqual(missing, [])
+
+    def test_aeon_library_defaults(self):
+        # the user's defaults (2026-11-19): Color backdrop + Colors corner boxes for Aeon and Aeon Glass only
+        for theme in ('aeon', 'glass'):
+            self.assertEqual(wizard.DEFAULTS[theme]['aeon.vbg'], 'color')
+            self.assertEqual(wizard.DEFAULTS[theme]['aeon.boxbg'], '')
+        self.assertEqual(wizard.DEFAULTS['fused']['aeon.vbg'], '')
 
     def test_palette_name(self):
         self.assertEqual(wizard.palette_name('Nord.xml'), 'Nord')
@@ -39,20 +93,16 @@ class TestWizard(unittest.TestCase):
         self.assertEqual(wizard.palette_index('Nord', names), 3)
         self.assertEqual(wizard.palette_index('Gone', names), 0)
 
-    def test_list_order_matches_skin(self):
-        # the skin's list (wizgen.py) is SKINDEFAULT + the colors files sorted; the helper must count the same way
+    def test_palette_pictures(self):
+        # the wizard's palette list shows colors/<name>.xml with media/aeon/wizard/pal_<name>.png
         skin = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'skin.aeon.fuse')
         colors = os.path.join(skin, 'colors')
-        wizard_xml = os.path.join(skin, '1080i', 'Custom_1173_SetupWizard.xml')
-        if not (os.path.isdir(colors) and os.path.isfile(wizard_xml)):
+        if not os.path.isdir(colors):
             self.skipTest('skin not beside the helper')
-        # the Fused Glass theme's own colours are not a palette (palette.names leaves them out too)
         names = [os.path.splitext(n)[0] for n in os.listdir(colors) if n.endswith('.xml') and n not in ('defaults.xml', 'Fused Glass.xml')]
-        import re
-        text = open(wizard_xml, encoding='utf-8').read()
-        listed = re.findall(r'SetProperty\(aeon\.wiz\.palette,([^,]+),home\)', text)
-        self.assertEqual(listed, ['SKINDEFAULT'] + sorted(names))
-        self.assertEqual(wizard.palette_index(listed[7], names), 7)
+        names = [n for n in names if not (n.endswith(' (menus)') or n.endswith(' (library)'))]
+        missing = [n for n in ['defaults'] + names if not os.path.isfile(os.path.join(skin, 'media', 'aeon', 'wizard', 'pal_%s.png' % n))]
+        self.assertEqual(missing, [])
 
     def test_menu_switch(self):
         positions = ['movies', 'tv', 'music', 'off', 'favourites'] + ['off'] * 8

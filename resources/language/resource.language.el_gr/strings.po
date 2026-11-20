@@ -187,3 +187,23 @@ msgstr "Η διεύθυνση της εφαρμογής στο δίκτυό σα
 msgctxt "#32047"
 msgid "Settings > General > Security in the app. It is sent only to this address."
 msgstr "Ρυθμίσεις > Γενικά > Ασφάλεια στην εφαρμογή. Στέλνεται μόνο σε αυτή τη διεύθυνση."
+
+msgctxt "#32048"
+msgid "Series premiere"
+msgstr "Πρεμιέρα σειράς"
+
+msgctxt "#32049"
+msgid "Season premiere"
+msgstr "Πρεμιέρα σεζόν"
+
+msgctxt "#32050"
+msgid "Mid-season finale"
+msgstr "Φινάλε μέσης σεζόν"
+
+msgctxt "#32051"
+msgid "Season finale"
+msgstr "Φινάλε σεζόν"
+
+msgctxt "#32052"
+msgid "Series finale"
+msgstr "Φινάλε σειράς"

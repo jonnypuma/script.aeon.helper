@@ -61,5 +61,17 @@
 				</setting>
 			</group>
 		</category>
+		<!-- 0.3.114 Skin settings > Libraries > Update and clean on another Kodi: its web server password (set from the
+		     skin's Password row, never shown here) -->
+		<category id="libremote" label="32035">
+			<group id="libremote">
+				<setting id="libremote_pass" type="string">
+					<level>4</level>
+					<default></default>
+					<constraints><allowempty>true</allowempty></constraints>
+					<control type="edit" format="string"><hidden>true</hidden></control>
+				</setting>
+			</group>
+		</category>
 	</section>
 </settings>

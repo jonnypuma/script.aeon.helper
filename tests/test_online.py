@@ -3,6 +3,7 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from resources.lib import online
 from resources.lib.online import build_path, find, index, plain, year_of
 
 LIBRARY = [{'movieid': 1, 'title': 'The Creator', 'year': 2023, 'uniqueid': {'tmdb': '670292', 'imdb': 'tt1'}},
@@ -51,3 +52,25 @@ class Online(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+def test_origin_of():
+    assert online.origin_of('') == ''
+    assert online.origin_of('us') == 'US'
+    assert online.origin_of('NO') == 'US%7CNO'
+    assert online.origin_of('Norway') == ''
+
+
+def test_cinema_path_with_origin():
+    plain = online.build_path('now_playing', 'movie')
+    assert plain == 'plugin://plugin.video.themoviedb.helper/?info=now_playing&tmdb_type=movie'
+    kept = online.build_path('now_playing', 'movie', origin='US%7CGB')
+    assert kept.startswith('plugin://plugin.video.themoviedb.helper/?info=discover&tmdb_type=movie')
+    assert kept.endswith('&with_origin_country=US%7CGB') and 'release_date.gte=t-42' in kept
+    assert online.build_path('popular', 'movie', origin='US') == 'plugin://plugin.video.themoviedb.helper/?info=popular&tmdb_type=movie'
+    assert online.build_path('now_playing', 'tv', origin='US') == 'plugin://plugin.video.themoviedb.helper/?info=now_playing&tmdb_type=tv'
+
+
+def test_cinema_countries_are_codes():
+    codes = [code for _, code in online.CINEMA_COUNTRIES]
+    assert len(codes) == len(set(codes)) and all(len(c) == 2 and c.isupper() for c in codes) and 'US' not in codes

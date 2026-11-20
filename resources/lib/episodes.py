@@ -8,8 +8,10 @@ def _result(rpc, method, params, key):
         return None
 
 
-def fetch_epmark(rpc, dbtype, dbid):
-    """'series_premiere' | 'season_premiere' | 'series_finale' | 'season_finale' | '' for an episode."""
+def fetch_epmark(rpc, dbtype, dbid, upcoming=None):
+    """'series_premiere' | 'season_premiere' | 'series_finale' | 'season_finale' | '' for an episode.
+    upcoming: next-aired entries (showtitle, season, episode); 0.3.115: the last episode of a season in the library is
+    no finale while a later episode of that season is still to air (The Rings of Power S3 E6 with E7 airing next week)."""
     if dbtype != 'episode':
         return ''
     try:
@@ -29,6 +31,13 @@ def fetch_epmark(rpc, dbtype, dbid):
                   {'tvshowid': show, 'season': season, 'properties': ['episode']}, 'episodes') or []
     if not eps or number < max(e.get('episode', 0) for e in eps):
         return ''
+    if upcoming:
+        title = ((_result(rpc, 'VideoLibrary.GetTVShowDetails', {'tvshowid': show, 'properties': ['title']},
+                          'tvshowdetails') or {}).get('title') or '').strip().lower()
+        for e in upcoming:
+            if ((e.get('showtitle') or '').strip().lower() == title and e.get('season') == season
+                    and (e.get('episode') or 0) > number):
+                return ''
     seasons = _result(rpc, 'VideoLibrary.GetSeasons', {'tvshowid': show, 'properties': ['season']}, 'seasons') or []
     last_season = max([s.get('season', 0) for s in seasons] or [season])
     status = (_result(rpc, 'VideoLibrary.GetTVShowDetails', {'tvshowid': show, 'properties': ['status']},

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Trimmed clearlogos for the skin's Low list (addon_data/script.aeon.helper/logos).
+"""Trimmed clearlogos for the skin's Low list and the Fused player card (addon_data/script.aeon.helper/logos).
 
-The skin shows Window(Home).Property(aeon.logo) while aeon.logo.src is the logo of the item on screen; until the
-trimmed copy exists it shows the original."""
+The skin shows Window(Home).Property(aeon.logo) while aeon.logo.src is the logo of the item on screen, and
+aeon.osd.logo while aeon.osd.logo.src is the logo of what is playing (0.3.72, the Now playing pill); until the trimmed
+copy exists it shows the original."""
 import os
 import threading
 
@@ -29,10 +30,14 @@ def current():
     return xbmc.getInfoLabel('ListItem.Art(tvshow.clearlogo)') or xbmc.getInfoLabel('ListItem.Art(clearlogo)')
 
 
-def publish(source, target):
+def playing():
+    return xbmc.getInfoLabel('Player.Art(tvshow.clearlogo)') or xbmc.getInfoLabel('Player.Art(clearlogo)')
+
+
+def publish(source, target, prop='aeon.logo'):
     home = xbmcgui.Window(10000)
-    home.setProperty('aeon.logo', target)
-    home.setProperty('aeon.logo.src', source)
+    home.setProperty(prop, target)
+    home.setProperty(prop + '.src', source)
 
 
 def make(source, target):
@@ -51,6 +56,8 @@ def make(source, target):
         os.replace(target + '.tmp', target)
         if current() == source:
             publish(source, target)
+        if playing() == source:
+            publish(source, target, 'aeon.osd.logo')
     except Exception as error:               # a logo that cannot be read is simply shown as it is
         _failed.add(source)
         xbmc.log('[script.aeon.helper] logo: %s' % error, xbmc.LOGINFO)
@@ -59,7 +66,9 @@ def make(source, target):
 
 
 def tick(state):
-    """Called from the service loop: follow the logo of the focused item while a view that needs it is open."""
+    """Called from the service loop: follow the logo of the focused item while a view that needs it is open, and the
+    logo of the video playing (the Fused player card's Now playing pill)."""
+    tick_player(state)
     if not xbmc.getCondVisibility(VIEWS):
         return
     source = current()
@@ -71,6 +80,21 @@ def tick(state):
     target = os.path.join(folder(), logotrim.cache_name(source))
     if os.path.isfile(target):
         publish(source, target)
+    elif source not in _busy:
+        _busy.add(source)
+        threading.Thread(target=make, args=(source, target)).start()
+
+
+def tick_player(state):
+    source = playing() if xbmc.getCondVisibility('Player.HasVideo') else ''
+    if source == state.get('osdlogo'):
+        return
+    state['osdlogo'] = source
+    if not source or source in _failed:
+        return
+    target = os.path.join(folder(), logotrim.cache_name(source))
+    if os.path.isfile(target):
+        publish(source, target, 'aeon.osd.logo')
     elif source not in _busy:
         _busy.add(source)
         threading.Thread(target=make, args=(source, target)).start()

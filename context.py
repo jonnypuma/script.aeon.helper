@@ -122,7 +122,8 @@ def which_library():
 def update():
     kind = which_library()
     if kind:
-        xbmc.executebuiltin('UpdateLibrary(%s)' % kind)
+        import remotelib
+        remotelib.run('update', kind)
 
 
 def clean():
@@ -130,7 +131,8 @@ def clean():
     if not kind:
         return
     if xbmcgui.Dialog().yesno(L(32002), L(32014) if kind == 'video' else L(32015)):
-        xbmc.executebuiltin('CleanLibrary(%s)' % kind)
+        import remotelib
+        remotelib.run('clean', kind)
 
 
 def screenshot():

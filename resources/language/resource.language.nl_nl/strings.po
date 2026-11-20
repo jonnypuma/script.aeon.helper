@@ -187,3 +187,23 @@ msgstr "Het adres van de app op je netwerk, bijvoorbeeld http://192.168.0.5:7878
 msgctxt "#32047"
 msgid "Settings > General > Security in the app. It is sent only to this address."
 msgstr "Instellingen > Algemeen > Beveiliging in de app. Hij gaat alleen naar dit adres."
+
+msgctxt "#32048"
+msgid "Series premiere"
+msgstr "Seriepremière"
+
+msgctxt "#32049"
+msgid "Season premiere"
+msgstr "Seizoenspremière"
+
+msgctxt "#32050"
+msgid "Mid-season finale"
+msgstr "Midseizoensfinale"
+
+msgctxt "#32051"
+msgid "Season finale"
+msgstr "Seizoensfinale"
+
+msgctxt "#32052"
+msgid "Series finale"
+msgstr "Seriefinale"

@@ -187,3 +187,23 @@ msgstr "应用在你网络中的地址，例如 http://192.168.0.5:7878"
 msgctxt "#32047"
 msgid "Settings > General > Security in the app. It is sent only to this address."
 msgstr "应用中的 设置 > 常规 > 安全。只会发送到此地址。"
+
+msgctxt "#32048"
+msgid "Series premiere"
+msgstr "剧集首播"
+
+msgctxt "#32049"
+msgid "Season premiere"
+msgstr "季首播"
+
+msgctxt "#32050"
+msgid "Mid-season finale"
+msgstr "季中完结"
+
+msgctxt "#32051"
+msgid "Season finale"
+msgstr "季终"
+
+msgctxt "#32052"
+msgid "Series finale"
+msgstr "剧终"
