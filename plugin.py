@@ -1208,6 +1208,12 @@ def main():
         xbmcplugin.addDirectoryItems(handle, items, len(items))
         xbmcplugin.endOfDirectory(handle, succeeded=True, cacheToDisc=False)
         return
+    if info == 'timerrules':                      # 0.3.123: the Timer rules page's cards
+        from resources.lib import livetv
+        items = livetv.rules_list()
+        xbmcplugin.addDirectoryItems(handle, items, len(items))
+        xbmcplugin.endOfDirectory(handle, succeeded=True, cacheToDisc=False)
+        return
     if info in ('peek', 'sources', 'substreams', 'audiostreams'):    # 0.3.118: round-3 Fused Glass style windows
         from resources.lib import round3
         if info == 'audiostreams':                   # 0.3.121: the File and season page of the player information

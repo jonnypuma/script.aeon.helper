@@ -3,6 +3,17 @@
 The helper is released together with the skin. Each version below names the skin version it came with. The skin's
 `CHANGELOG.md` tells the whole story of each feature. Versions not listed here have no note of their own there.
 
+## 0.3.123
+- Live TV in the Fused Glass style (skin 0.56.53, canvas round 8), resources/lib/livetv.py: the guide's day strip
+  (eight days, a dot where a timer is set, the day in view, the day in words for the programme's line) and the Timer
+  rules cards (?info=timerrules: what each rule catches as a sentence; livetv,delrule deletes the focused rule).
+- TV Timers: Kodi 22 has no timertype field (the timer list came back empty); reminders now count as their own kind.
+
+## 0.3.122
+- TV Timers as the week in lanes of time (skin 0.56.53, canvas round 7 idea B), resources/lib/tmweek.py: the next five
+  days with up to three timers a day placed by their time, the hour span, the now mark, the header and the block of
+  the focused row; RunScript(script.aeon.helper,tmweek,delete) deletes the focused timer after asking.
+
 ## 0.3.121
 - The Sort and show only panel (skin 0.56.53, dialog 1179, Films in the Fused Glass style), resources/lib/sortshow.py:
   the sorts Kodi offers for films, OK again flips the order; filters (unwatched, in progress, watched, 4K, HDR, several

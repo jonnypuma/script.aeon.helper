@@ -1514,6 +1514,10 @@ def run():
     sk_chapters = skchapters.SkippyChapters()
     fgs_facts = fgsfacts.Facts()
     round3_facts = round3.Facts()
+    from resources.lib import tmweek            # 0.3.122: TV Timers as the week in lanes
+    timers_week = tmweek.Week()
+    from resources.lib import livetv            # 0.3.123: the guide's day strip
+    guide_days = livetv.Days()
     palette = {}
     try:
         menufile.ensure_android()
@@ -1584,6 +1588,8 @@ def run():
         try:
             fgs_facts.tick()
             round3_facts.tick()
+            timers_week.tick()
+            guide_days.tick()
         except Exception as error:
             xbmc.log('[script.aeon.helper] fgs facts: %s' % error, xbmc.LOGINFO)
         TIME_LEFT.tick()

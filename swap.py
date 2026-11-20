@@ -985,6 +985,9 @@ def main(argv):
             if picked >= 0:
                 xbmc.executebuiltin('Skin.SetString(aeon.livetv.group,%s)' % ids[picked])
                 xbmc.executebuiltin('Skin.SetString(aeon.livetv.groupname,%s)' % names[picked].replace(',', ' '))
+    elif argv[0] == 'tmweek' and len(argv) >= 2 and argv[1] == 'delete':   # 0.3.122: TV Timers, the focused block
+        from resources.lib import tmweek
+        tmweek.delete()
     elif argv[0] == 'sortshow':                        # 0.3.121: the Sort and show only panel (skin dialog 1179)
         from resources.lib import sortshow
         sortshow.run(argv[1:])

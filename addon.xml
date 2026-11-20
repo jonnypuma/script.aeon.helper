@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="script.aeon.helper" name="Aeon Fuse Helper" version="0.3.121" provider-name="Aeon Fuse">
+<addon id="script.aeon.helper" name="Aeon Fuse Helper" version="0.3.123" provider-name="Aeon Fuse">
 	<requires>
 		<import addon="xbmc.python" version="3.0.1"/>
 		<!-- optional: the Planner and online lists read TMDb Helper; artwork colours come from KarmaMole's helper -->
