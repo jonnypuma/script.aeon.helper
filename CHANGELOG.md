@@ -3,6 +3,10 @@
 The helper is released together with the skin. Each version below names the skin version it came with. The skin's
 `CHANGELOG.md` tells the whole story of each feature. Versions not listed here have no note of their own there.
 
+## 0.3.124
+- Recommended add-ons (skin 0.56.54): TinyPPI only on CoreELEC; elsewhere its row says "CoreELEC only", it is not
+  counted in n / 15 and the setup wizard does not install it (recommended.fits).
+
 ## 0.3.123
 - Live TV in the Fused Glass style (skin 0.56.53, canvas round 8), resources/lib/livetv.py: the guide's day strip
   (eight days, a dot where a timer is set, the day in view, the day in words for the programme's line) and the Timer

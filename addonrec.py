@@ -23,6 +23,16 @@ def _items():
     return recommended.listed(platform.machine(), platform.system(), xbmc.getCondVisibility('System.Platform.Android'))
 
 
+def _coreelec():
+    return 'coreelec' in xbmc.getInfoLabel('System.OSVersionInfo').lower()
+
+
+def _counted():
+    """the list without the add-ons this system cannot run (TinyPPI off CoreELEC)"""
+    ce = _coreelec()
+    return [i for i in _items() if recommended.fits(i[0], ce)]
+
+
 def _s(sid):
     return xbmcaddon.Addon(SKIN).getLocalizedString(sid)
 
@@ -113,11 +123,14 @@ def show():
         rows = recommended.rows(_has, _version, _items())
         items = []
         for aid, name, sid, inst, ver, need in rows:
-            state = (_s(32764) + (' ' + ver if ver else '')) if inst else _s(32765)
+            if not inst and not recommended.fits(aid, _coreelec()):
+                state = xbmc.getInfoLabel('$ADDON[skin.aeon.fuse 32820]')
+            else:
+                state = (_s(32764) + (' ' + ver if ver else '')) if inst else _s(32765)
             li = xbmcgui.ListItem(name, '%s  ·  %s' % (state, _s(sid)))
             li.setArt({'icon': _icon(aid, inst), 'thumb': _icon(aid, inst)})
             items.append(li)
-        done, total = recommended.count(_has, _items())
+        done, total = recommended.count(_has, _counted())
         heading = '%s  (%d / %d)' % (_s(32762), done, total)
         got = xbmcgui.Dialog().select(heading, items, useDetails=True, preselect=pos)
         xbmc.executebuiltin('Skin.SetString(aeon.rec.count,%d / %d)' % (done, total))
@@ -128,11 +141,14 @@ def show():
         if inst:
             xbmcgui.Dialog().notification(name, _s(32764), _icon(aid, True), 2500)
             continue
+        if not recommended.fits(aid, _coreelec()):
+            xbmcgui.Dialog().notification(name, xbmc.getInfoLabel('$ADDON[skin.aeon.fuse 32820]'), _icon(aid, False), 3000)
+            continue
         install(aid, name, need)
 
 
 def count():
-    done, total = recommended.count(_has, _items())
+    done, total = recommended.count(_has, _counted())
     xbmc.executebuiltin('Skin.SetString(aeon.rec.count,%d / %d)' % (done, total))
 
 
@@ -140,7 +156,7 @@ def batch():
     """Setup wizard, add-ons step, Next: install every ticked add-on (Skin.HasSetting(aeon.wiz.add.<id>)) one after
     the other while the wizard goes on; the ticks are cleared."""
     todo = []
-    for aid, name, _sid, inst, _ver, need in recommended.rows(_has, items=_items()):
+    for aid, name, _sid, inst, _ver, need in recommended.rows(_has, items=_counted()):
         flag = 'aeon.wiz.add.%s' % aid
         if xbmc.getCondVisibility('Skin.HasSetting(%s)' % flag):
             xbmc.executebuiltin('Skin.Reset(%s)' % flag)

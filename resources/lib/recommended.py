@@ -22,6 +22,14 @@ ADDONS = [
     ('resource.font.robotocjksc', 'Roboto CJKSC', 32770, 'repository.jamal2362'),
 ]
 
+# add-ons for one system only (0.3.124): elsewhere their row says so and they are not counted or installed
+ONLY_ON = {'script.tinyppi': 'coreelec'}
+
+
+def fits(aid, coreelec):
+    return ONLY_ON.get(aid) != 'coreelec' or bool(coreelec)
+
+
 # Aeon Fuse Waveform Visualizer (0.3.115): one add-on per build, the right one for this device (platform.machine())
 WAVE_NAME = 'Aeon Fuse Waveform Visualizer'
 WAVE_STRING = 32797

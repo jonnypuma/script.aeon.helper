@@ -54,3 +54,12 @@ class WaveformTest(unittest.TestCase):
         self.assertEqual(dict((a[0], a[3]) for a in items)['visualization.aeonwave.linux-arm64'], 'repository.skippyrepo')
         self.assertEqual(len(recommended.listed('aarch64', 'Linux', android=True)), len(recommended.ADDONS))
         self.assertEqual(recommended.count(lambda a: False, items), (0, len(recommended.ADDONS) + 1))
+
+
+class TestOnlyOn(unittest.TestCase):
+    def test_tinyppi_only_on_coreelec(self):
+        self.assertFalse(recommended.fits('script.tinyppi', False))
+        self.assertTrue(recommended.fits('script.tinyppi', True))
+
+    def test_others_everywhere(self):
+        self.assertTrue(recommended.fits('service.skippy', False))
