@@ -90,6 +90,39 @@ class Days(object):
         n = (d - today).days if d else -1
         self.put('aeon.gd.cur', str(n + 1) if 0 <= n < 8 else '')
         self.put('aeon.gd.long', long_day(d) if d else '')
+        for key, value in now_pill(xbmc.getInfoLabel('System.Time')).items():
+            self.put(key, value)
+
+
+def now_pill(clock):
+    """0.3.128 (skin 0.56.56, Fusion guide: "add small current time pill above the yellow dot"): the guide's ruler has
+    one item per half hour, labelled like System.Time ("16:30", "4:30 PM"). aeon.gd.half is the label of the half hour
+    now runs in and aeon.gd.min the minutes into it (0..29), so the ruler item with that label draws the pill at that
+    minute's place - it follows the grid when it scrolls. aeon.gd.hidelbl names the ruler label the pill would cover
+    (this half's own label early on, the next one late in the half)."""
+    import re
+    m = re.search(r'(\d{1,2}):(\d{2})', clock or '')
+    if not m:
+        return {'aeon.gd.half': '', 'aeon.gd.min': '', 'aeon.gd.hidelbl': ''}
+    hour, mins = m.group(1), int(m.group(2))
+    half = '00' if mins < 30 else '30'
+    twelve = bool(re.search(r'[^\d\s:]', clock[m.end():] + clock[:m.start()]))
+
+    def label(h, mm):
+        return clock[:m.start()] + h + ':' + mm + clock[m.end():]
+    hide = ''
+    if mins % 30 < 8:
+        hide = label(hour, half)
+    elif mins % 30 >= 22:
+        if half == '00':
+            hide = label(hour, '30')
+        else:
+            h = int(hour) + 1
+            if not twelve:
+                hide = label(str(h % 24).zfill(len(hour)), '00')
+            elif h != 12:                    # (11:30 -> 12:00 flips AM / PM, the region's own word: left alone)
+                hide = label(str(1 if h == 13 else h).zfill(2 if hour.startswith('0') else 1), '00')
+    return {'aeon.gd.half': label(hour, half), 'aeon.gd.min': str(mins % 30), 'aeon.gd.hidelbl': hide}
 
 
 WEEK = (11, 12, 13, 14, 15, 16, 17)          # Kodi: Monday .. Sunday

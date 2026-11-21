@@ -3,6 +3,24 @@
 The helper is released together with the skin. Each version below names the skin version it came with. The skin's
 `CHANGELOG.md` tells the whole story of each feature. Versions not listed here have no note of their own there.
 
+## 0.3.128
+
+- Fusion TV guide: the current time pill above the yellow now dot. While the guide is open the helper publishes the
+  half hour now runs in (`aeon.gd.half`, written like the guide's ruler labels), the minutes into it (`aeon.gd.min`)
+  and the ruler label the pill would cover (`aeon.gd.hidelbl`). Skin 0.56.56.
+
+## 0.3.127
+
+- Start-up splash fanart only from G / PG rated films and shows (TV-G, TV-PG, TV-Y, UK U; "Rated PG", "US:PG" and the
+  like); unrated or adult titles are never shown. None found: no fanart.
+- One edition everywhere: the sidecar edition (aeon.mi.edition, aeon.pf.mi.edition) takes Kodi's own version name of
+  the film when it has a real one ("50th Anniversary Edition"); the sidecar's edition (Curator wrote
+  "Anniversary Edition") only when it has none. The list showed Kodi's name, the info page and the player the sidecar's.
+
+## 0.3.126
+- The Fuse menu theme is removed (skin 0.56.56): Skin style and the setup wizard no longer set it, and anyone on it
+  goes back to the standard menus at start (one skin load, under the splash).
+
 ## 0.3.125
 - Fonts after a skin update (skin 0.56.55): the skin reload that writes your fonts into the fresh Font.xml no longer
   ends the start-up splash (fontpick.sync sets aeon.splash.keep first).

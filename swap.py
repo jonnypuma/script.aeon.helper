@@ -865,11 +865,13 @@ def main(argv):
         import xbmcgui
         from resources.lib import wizard
         cur = xbmc.getInfoLabel('Skin.String(aeon.menutheme)')
-        order = ['mosaic', 'ledger', '', 'tabslab', 'fused']
+        # 0.3.126 (skin 0.56.56): Fuse is gone (Aeon and Aeon Glass hard-edged everywhere); a pick of it is the standard
+        # menus, and Aeon Glass has only its own menus
+        order = ['mosaic', 'ledger', '', 'tabslab']
         if len(argv) >= 2:
-            target = '' if argv[1] in ('aeon', 'bridge') else argv[1]
+            target = '' if argv[1] in ('aeon', 'bridge', 'fused') else argv[1]
         elif xbmc.getCondVisibility('Skin.HasSetting(aeon.vglass)'):
-            target = '' if cur == 'fused' else 'fused'
+            target = ''
         else:
             # OK on the row in the Aeon theme: the next option, round to the first
             target = order[(order.index(cur) + 1) % len(order)] if cur in order else ''

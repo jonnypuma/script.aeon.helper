@@ -1158,6 +1158,16 @@ class DolbyVision(object):
             threading.Thread(target=self.read, args=(path,)).start()
 
 
+def kodi_edition(name):
+    """0.3.127 the library's own version name of a film ("50th Anniversary Edition") when it is a real one: not empty,
+    not Kodi's default (Standard Edition, 40400) and not NONE. The sidecar's <edition> (Curator wrote "Anniversary
+    Edition") can differ from it, so Kodi's name wins: one edition everywhere (lists, info page, player)."""
+    name = (name or '').strip()
+    if not name or name.upper() == 'NONE' or name.startswith('Standard') or name == xbmc.getLocalizedString(40400):
+        return ''
+    return name
+
+
 class MediaInfoSidecar(object):
     """0.3.97 Skin settings > Details > Media info from sidecars (Skin.HasSetting(aeon.mi.sidecar), off by default): the
     mediainfo sidecar of the film / episode in focus (Curator Media Manager's <name>.cmm_mediainfo.xml first, else
@@ -1171,9 +1181,12 @@ class MediaInfoSidecar(object):
         self.seen = None
         self.known = {}
         self.busy = set()
+        self.versions = {}                     # 0.3.127 path -> Kodi's version name (kodi_edition)
 
     def publish(self, path, values):
         home = xbmcgui.Window(10000)
+        if values and self.versions.get(path):
+            values = dict(values, edition=self.versions[path])
         for key in self.KEYS:
             home.setProperty('aeon.mi.' + key, values.get(key, '') if values else '')
         home.setProperty('aeon.mi.path', path if values else '')
@@ -1235,6 +1248,10 @@ class MediaInfoSidecar(object):
         if path == self.seen:
             return
         self.seen = path
+        if path:
+            if len(self.versions) > 400:
+                self.versions.clear()
+            self.versions[path] = kodi_edition(xbmc.getInfoLabel(pfx + 'VideoVersionName'))
         if path in self.known:
             self.publish(path, self.known[path])
         elif path and path not in self.busy:
@@ -1249,9 +1266,12 @@ class PlayerSidecar(object):
 
     def __init__(self):
         self.seen = None
+        self.version = ''                      # 0.3.127 Kodi's version name of the video playing (kodi_edition)
 
     def publish(self, path, dvp, values):
         home = xbmcgui.Window(10000)
+        if values and self.version:
+            values = dict(values, edition=self.version)
         home.setProperty('aeon.pf.dvp', dvp or '')
         for key in self.KEYS:
             home.setProperty('aeon.pf.mi.' + key, (values or {}).get(key, ''))
@@ -1302,6 +1322,7 @@ class PlayerSidecar(object):
         if not path or path == self.seen:
             return
         self.seen = path
+        self.version = kodi_edition(xbmc.getInfoLabel('VideoPlayer.VideoVersionName'))
         self.publish('', '', {})
         threading.Thread(target=self.read, args=(path,)).start()
 
@@ -1430,15 +1451,33 @@ def migrate_fanblur():
         xbmc.log('[script.aeon.helper] fanart blur migration: %s' % error, xbmc.LOGINFO)
 
 
+SPLASH_RATINGS = ('G', 'PG', 'U', 'TV-G', 'TV-PG', 'TV-Y', 'TV-Y7', 'TV-Y7-FV')
+
+
+def family_rating(mpaa):
+    """0.3.127 True for a G / PG (TV-G, TV-PG, TV-Y, UK U) rating, in any of the usual spellings ("Rated PG", "US:PG",
+    "PG (for ...)"); unrated or anything else is False"""
+    m = (mpaa or '').strip().upper()
+    if m.startswith('RATED '):
+        m = m[6:]
+    if ':' in m:
+        m = m.split(':', 1)[1]
+    m = m.replace('_', '-').split(' ')[0].split('(')[0].strip()
+    return m in SPLASH_RATINGS
+
+
 def splash_fanart():
     """0.3.108 (skin 0.56.42): the start-up splash shows a random film's (else show's) fanart from the library under its
-    veil: Window(Home).Property(aeon.splash.fan). One library call each, in a thread, as the service starts."""
+    veil: Window(Home).Property(aeon.splash.fan). One library call each, in a thread, as the service starts.
+    0.3.127: only from G / PG rated films and shows (user: a "quite spicy picture" on the splash); none found, no fanart."""
     for method, key in (('VideoLibrary.GetMovies', 'movies'), ('VideoLibrary.GetTVShows', 'tvshows')):
         try:
-            got = rpc(method, {'properties': ['art'], 'sort': {'method': 'random'}, 'limits': {'start': 0, 'end': 5}}).get('result')
+            got = rpc(method, {'properties': ['art', 'mpaa'], 'sort': {'method': 'random'}, 'limits': {'start': 0, 'end': 60}}).get('result')
         except Exception:
             continue
         for item in (got or {}).get(key) or []:
+            if not family_rating(item.get('mpaa')):
+                continue
             fan = (item.get('art') or {}).get('fanart')
             if fan:
                 xbmcgui.Window(10000).setProperty('aeon.splash.fan', fan)
@@ -1479,6 +1518,18 @@ def run():
     # the library may still be opening at start-up
     if monitor.waitForAbort(10):
         return
+    # 0.3.126 (skin 0.56.56): the Fuse menu theme is removed; anyone on it goes back to the standard menus. Fuse's
+    # textures load with the skin, so the skin loads again (the start-up splash stays up over it, aeon.splash.keep).
+    if xbmc.getSkinDir() == 'skin.aeon.fuse' and xbmc.getInfoLabel('Skin.String(aeon.menutheme)') == 'fused':
+        xbmc.executebuiltin('Skin.Reset(aeon.menutheme)')
+        home = xbmcgui.Window(10000)
+        if home.getProperty('aeon.splash'):
+            home.setProperty('aeon.splash.keep', '1')
+        xbmc.log('[script.aeon.helper] Fuse menu theme removed: standard menus', xbmc.LOGINFO)
+        xbmc.sleep(500)
+        xbmc.executebuiltin('ReloadSkin()')
+        if monitor.waitForAbort(8):
+            return
     # the user's per-section fonts, after a skin update put a fresh Font.xml in place
     import fontpick
     fontpick.sync()

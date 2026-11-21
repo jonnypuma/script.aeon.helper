@@ -23,9 +23,12 @@ class TestWizard(unittest.TestCase):
         self.assertEqual(wizard.plan(dict(self.NOW, fgmenu='frost'), self.NOW), [('fgmenu', 'frost')])
         self.assertEqual(wizard.plan(dict(self.NOW, fgmenu=''), self.NOW), [('fgmenu', '')])
         aeon = {'theme': 'aeon', 'menutheme': '', 'fgmenu': '', 'palette': ''}
-        self.assertEqual(wizard.plan(dict(aeon, menutheme='fused'), aeon), [('menutheme', 'fused')])
-        glass = {'theme': 'glass', 'menutheme': 'fused', 'fgmenu': '', 'palette': ''}
-        self.assertEqual(wizard.plan(dict(glass, menutheme='mosaic'), glass), [('menutheme', '')])
+        # 0.3.126: Fuse is removed: picking it is the standard menus (the service moves anyone still on it at start)
+        self.assertEqual(wizard.plan(dict(aeon, menutheme='fused'), aeon), [])
+        self.assertEqual(wizard.plan(dict(aeon, menutheme='mosaic'), aeon), [('menutheme', 'mosaic')])
+        glass = {'theme': 'glass', 'menutheme': '', 'fgmenu': '', 'palette': ''}
+        self.assertEqual(wizard.plan(dict(glass, menutheme='fused'), glass), [])
+        self.assertEqual(wizard.plan(dict(glass, menutheme='mosaic'), glass), [])
 
     def test_palette(self):
         aeon = {'theme': 'aeon', 'menutheme': '', 'fgmenu': '', 'palette': 'SKINDEFAULT'}

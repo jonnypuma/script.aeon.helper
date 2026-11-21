@@ -69,7 +69,7 @@ def defaults(theme):
 
 def _menutheme(value):
     value = (value or '').strip().lower()
-    return '' if value in ('', 'bridge', 'aeon') else value
+    return '' if value in ('', 'bridge', 'aeon', 'fused') else value     # 0.3.126: Fuse removed
 
 
 def _fgmenu(value):
